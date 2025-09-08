@@ -11,7 +11,7 @@ import { ModeToggle } from "../ui/theme-toggle";
 
 export default function NavBar() {
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm border-b">
       <div className="container space-x-4 flex justify-between items-center mx-auto">
         <div className="flex h-16 items-center">
           <Link href="/">

@@ -1,13 +1,17 @@
 "use client";
 
 import { restoreUser } from "@/actions/user";
-import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  type UseMutationOptions,
+} from "@tanstack/react-query";
 
 type RestoreUserMutationOptions = UseMutationOptions<
   Awaited<ReturnType<typeof restoreUser>>,
   Error,
   number
->
+>;
 
 export function useRestoreUser(options?: RestoreUserMutationOptions) {
   const queryClient = useQueryClient();
@@ -20,7 +24,7 @@ export function useRestoreUser(options?: RestoreUserMutationOptions) {
       queryClient.refetchQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["user", id] });
       queryClient.invalidateQueries({ queryKey: ["users", "deleted"] });
-      
+
       // Call custom onSuccess if provided (component-specific logic)
       options?.onSuccess?.(result, id, context);
     },

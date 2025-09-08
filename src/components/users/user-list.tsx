@@ -74,51 +74,47 @@ export function UserList() {
   }
 
   return (
-    <div className="space-y-2">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
-        Users ({usersData.users.length})
-      </h2>
-
-      <div className="space-y-2">
-        {usersData.users.map((user: User) => (
-          <div
-            key={user.id}
-            className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center space-x-2">
-                  <h3 className="font-medium text-gray-900">
-                    {user.first_name} {user.last_name}
-                  </h3>
-                  <span className="text-sm text-gray-500">#{user.id}</span>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">{user.email}</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Created: {new Date(user.created_at).toLocaleDateString()}
-                </p>
-              </div>
-
+    <ul className="divide-y rounded-lg border">
+      {usersData.users.map((user: User) => (
+        <li
+          key={user.id}
+          className="p-4 rounded-lg hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
               <div className="flex items-center space-x-2">
-                <button
-                  className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                  title="Edit user"
-                >
-                  <Edit size={16} />
-                </button>
-                <button
-                  onClick={() => handleDelete(user.id)}
-                  disabled={deletingId === user.id}
-                  className="p-2 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
-                  title="Delete user"
-                >
-                  <Trash2 size={16} />
-                </button>
+                <h3 className="font-medium">
+                  {user.first_name} {user.last_name}
+                </h3>
+                <span className="text-sm text-muted-foreground">
+                  #{user.id}
+                </span>
               </div>
+              <p className="text-sm text-muted-foreground mt-1">{user.email}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Created: {new Date(user.created_at).toLocaleDateString()}
+              </p>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <button
+                className="p-2 text-muted-foreground hover:text-blue-600 transition-colors"
+                title="Edit user"
+              >
+                <Edit size={16} />
+              </button>
+              <button
+                onClick={() => handleDelete(user.id)}
+                disabled={deletingId === user.id}
+                className="p-2 text-muted-foreground hover:text-red-600 transition-colors disabled:opacity-50"
+                title="Delete user"
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
           </div>
-        ))}
-      </div>
-    </div>
+        </li>
+      ))}
+    </ul>
   );
 }

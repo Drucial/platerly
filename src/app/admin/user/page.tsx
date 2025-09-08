@@ -2,14 +2,20 @@
 
 import { CreateUserForm } from "@/components/users/create-user-form";
 import { UserList } from "@/components/users/user-list";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
 
 export default function AdminUserPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen py-8">
       <div className="container mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <h1 className="text-3xl font-bold">User Management</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
             Manage users, create new accounts, and handle user data
           </p>
         </div>
@@ -17,14 +23,26 @@ export default function AdminUserPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left column - User List */}
           <div className="lg:col-span-1">
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <UserList />
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Users</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <UserList />
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right column - Create User Form */}
           <div className="lg:col-span-1">
-            <CreateUserForm />
+            <Card>
+              <CardHeader>
+                <CardTitle>Create User</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CreateUserForm />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

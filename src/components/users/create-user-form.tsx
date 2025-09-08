@@ -68,11 +68,7 @@ export function CreateUserForm() {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
-        Create New User
-      </h2>
-
+    <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -148,6 +144,6 @@ export function CreateUserForm() {
         existingUser={existingUser}
         onRestoreComplete={handleRestoreComplete}
       />
-    </div>
+    </>
   );
 }
