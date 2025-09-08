@@ -17,6 +17,38 @@ export type UpdateUserData = {
 
 export async function createUser(data: CreateUserData) {
   try {
+    // First check if a soft-deleted user exists with this email
+    const existingDeletedUser = await db.user.findFirst({
+      where: {
+        email: data.email,
+        destroyed_at: { not: null }, // Only soft-deleted users
+      },
+    })
+
+    if (existingDeletedUser) {
+      return {
+        success: false,
+        error: "EXISTING_DELETED_USER",
+        existingUser: existingDeletedUser,
+      }
+    }
+
+    // Check for active user with same email
+    const existingActiveUser = await db.user.findFirst({
+      where: {
+        email: data.email,
+        destroyed_at: null, // Active users
+      },
+    })
+
+    if (existingActiveUser) {
+      return {
+        success: false,
+        error: "Email already exists",
+      }
+    }
+
+    // Create new user
     const user = await db.user.create({
       data: {
         first_name: data.first_name,

@@ -1,23 +1,36 @@
-"use client"
+"use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { restoreUser } from "@/actions/user"
+import { restoreUser } from "@/actions/user";
+import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query";
 
-export function useRestoreUser() {
-  const queryClient = useQueryClient()
+type RestoreUserMutationOptions = UseMutationOptions<
+  Awaited<ReturnType<typeof restoreUser>>,
+  Error,
+  number
+>
+
+export function useRestoreUser(options?: RestoreUserMutationOptions) {
+  const queryClient = useQueryClient();
 
   return useMutation({
+    ...options,
     mutationFn: (id: number) => restoreUser(id),
-    onSuccess: (result, id) => {
-      // Invalidate and refetch users list
-      queryClient.invalidateQueries({ queryKey: ["users"] })
-      // Invalidate the specific user query
-      queryClient.invalidateQueries({ queryKey: ["user", id] })
-      // Invalidate deleted users list
-      queryClient.invalidateQueries({ queryKey: ["users", "deleted"] })
+    onSuccess: (result, id, context) => {
+      // Always refetch queries immediately (core hook functionality)
+      queryClient.refetchQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["user", id] });
+      queryClient.invalidateQueries({ queryKey: ["users", "deleted"] });
+      
+      // Call custom onSuccess if provided (component-specific logic)
+      options?.onSuccess?.(result, id, context);
     },
-    onError: (error) => {
-      console.error("Failed to restore user:", error)
+    onError: (error, id, context) => {
+      // Call custom onError if provided
+      options?.onError?.(error, id, context);
     },
-  })
+    onMutate: (id) => {
+      // Call custom onMutate if provided
+      return options?.onMutate?.(id);
+    },
+  });
 }

@@ -18,10 +18,12 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { RestoreUserDialog } from "./restore-user-dialog";
 
 export function CreateUserForm() {
-  const createUserMutation = useCreateUser();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+  const [existingUser, setExistingUser] = useState<any>(null);
 
   const form = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
@@ -32,21 +34,37 @@ export function CreateUserForm() {
     },
   });
 
-  const onSubmit = async (data: CreateUserFormData) => {
-    setIsSubmitting(true);
-    try {
-      const result = await createUserMutation.mutateAsync(data);
+  const createUserMutation = useCreateUser({
+    onSuccess: (result) => {
       if (result.success) {
         form.reset();
-        console.log("User created successfully:", result.user);
+        toast.success("User created successfully", {
+          description: `${result.user?.first_name} ${result.user?.last_name} has been added to the system.`,
+        });
+      } else if (result.error === "EXISTING_DELETED_USER") {
+        // Show restoration dialog
+        setExistingUser(result.existingUser);
+        setShowRestoreDialog(true);
       } else {
-        console.error("Failed to create user:", result.error);
+        toast.error("Failed to create user", {
+          description: result.error || "An unexpected error occurred.",
+        });
       }
-    } catch (error) {
-      console.error("Error creating user:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    },
+    onError: (error: any) => {
+      toast.error("Error creating user", {
+        description: error.message || "An unexpected error occurred.",
+      });
+    },
+  });
+
+  const onSubmit = (data: CreateUserFormData) => {
+    createUserMutation.mutate(data);
+  };
+
+  const handleRestoreComplete = () => {
+    form.reset();
+    setExistingUser(null);
   };
 
   return (
@@ -105,8 +123,12 @@ export function CreateUserForm() {
           />
 
           <div className="pt-4">
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? "Creating..." : "Create User"}
+            <Button
+              type="submit"
+              disabled={createUserMutation.isPending}
+              className="w-full"
+            >
+              {createUserMutation.isPending ? "Creating..." : "Create User"}
             </Button>
           </div>
         </form>
@@ -119,6 +141,13 @@ export function CreateUserForm() {
           </div>
         </div>
       )}
+
+      <RestoreUserDialog
+        open={showRestoreDialog}
+        onOpenChange={setShowRestoreDialog}
+        existingUser={existingUser}
+        onRestoreComplete={handleRestoreComplete}
+      />
     </div>
   );
 }

@@ -1,23 +1,36 @@
 "use client"
 
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query"
 import { deleteUser } from "@/actions/user"
 
-export function useDeleteUser() {
+type DeleteUserMutationOptions = UseMutationOptions<
+  Awaited<ReturnType<typeof deleteUser>>,
+  Error,
+  number
+>
+
+export function useDeleteUser(options?: DeleteUserMutationOptions) {
   const queryClient = useQueryClient()
 
   return useMutation({
+    ...options,
     mutationFn: (id: number) => deleteUser(id),
-    onSuccess: (result, id) => {
-      // Invalidate and refetch users list
-      queryClient.invalidateQueries({ queryKey: ["users"] })
-      // Invalidate the specific user query
+    onSuccess: (result, id, context) => {
+      // Always refetch queries immediately (core hook functionality)
+      queryClient.refetchQueries({ queryKey: ["users"] })
       queryClient.invalidateQueries({ queryKey: ["user", id] })
-      // Invalidate deleted users list if being used
       queryClient.invalidateQueries({ queryKey: ["users", "deleted"] })
+      
+      // Call custom onSuccess if provided (component-specific logic)
+      options?.onSuccess?.(result, id, context)
     },
-    onError: (error) => {
-      console.error("Failed to delete user:", error)
+    onError: (error, id, context) => {
+      // Call custom onError if provided
+      options?.onError?.(error, id, context)
+    },
+    onMutate: (id) => {
+      // Call custom onMutate if provided
+      return options?.onMutate?.(id)
     },
   })
 }

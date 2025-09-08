@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { ModeToggle } from "../ui/theme-toggle";
 
 export default function NavBar() {
   return (
@@ -52,6 +53,7 @@ export default function NavBar() {
               </Button>
             );
           })}
+          <ModeToggle />
         </nav>
       </div>
     </header>

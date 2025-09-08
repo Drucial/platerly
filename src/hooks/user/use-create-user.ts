@@ -1,19 +1,30 @@
 "use client"
 
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query"
 import { createUser, type CreateUserData } from "@/actions/user"
 
-export function useCreateUser() {
+type CreateUserMutationOptions = UseMutationOptions<
+  Awaited<ReturnType<typeof createUser>>,
+  Error,
+  CreateUserData
+>
+
+export function useCreateUser(options?: CreateUserMutationOptions) {
   const queryClient = useQueryClient()
 
   return useMutation({
+    ...options,
     mutationFn: (data: CreateUserData) => createUser(data),
-    onSuccess: () => {
-      // Invalidate and refetch users list
-      queryClient.invalidateQueries({ queryKey: ["users"] })
+    onSuccess: (result, variables, context) => {
+      // Always refetch users list immediately (core hook functionality)
+      queryClient.refetchQueries({ queryKey: ["users"] })
+      
+      // Call custom onSuccess if provided (component-specific logic)
+      options?.onSuccess?.(result, variables, context)
     },
-    onError: (error) => {
-      console.error("Failed to create user:", error)
+    onError: (error, variables, context) => {
+      // Call custom onError if provided
+      options?.onError?.(error, variables, context)
     },
   })
 }
