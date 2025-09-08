@@ -21,6 +21,13 @@ Core features include:
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint
 
+### Database Commands
+- `pnpm db:generate` - Regenerate Prisma client
+- `pnpm db:push` - Push schema to database
+- `pnpm db:migrate` - Create and run migrations
+- `pnpm db:studio` - Open Prisma Studio GUI
+- `pnpm db:reset` - Reset database
+
 ### Package Manager
 This project uses **pnpm** as the package manager (confirmed by presence of pnpm-lock.yaml).
 
@@ -36,6 +43,8 @@ This project uses **pnpm** as the package manager (confirmed by presence of pnpm
 - **PostgreSQL** for database
 - **Prisma** for database ORM and migrations
 - **TanStack Query** for server state management and data fetching
+- **React Hook Form** with Zod validation for forms
+- **Sonner** for toast notifications
 - **Motion/React** (Framer Motion) for animations and transitions
 - **OpenAI API** for AI-powered recipe parsing and smart features
 - **AWS S3** for file storage (recipe images, user uploads)
@@ -43,17 +52,31 @@ This project uses **pnpm** as the package manager (confirmed by presence of pnpm
 ### Directory Structure
 ```
 src/                 # Source code directory (Next.js 13+ src pattern)
+  ├── actions/       # Next.js Server Actions
+  │   └── user.ts    # User CRUD operations
   ├── app/           # Next.js App Router pages and layouts
-  │   ├── page.tsx   # Home page (currently default Next.js template)
-  │   ├── layout.tsx # Root layout with Geist fonts
+  │   ├── admin/     # Admin pages
+  │   │   └── user/  # User management admin page
+  │   ├── page.tsx   # Home page
+  │   ├── layout.tsx # Root layout with QueryProvider and Toaster
   │   └── globals.css # Global Tailwind styles
   ├── components/    # Reusable React components
-  │   └── ui/        # shadcn/ui components
+  │   ├── ui/        # shadcn/ui components (Button, Form, Dialog, etc.)
+  │   └── users/     # User-specific components
+  ├── generated/     # Generated files (Prisma client)
+  │   └── prisma/    # Generated Prisma client
   ├── hooks/         # Custom React hooks
+  │   └── user/      # User-related TanStack Query hooks
   ├── lib/           # Utility functions and configurations
-  │   └── utils.ts   # Utility functions (cn helper for class merging)
+  │   ├── db.ts      # Prisma client singleton
+  │   ├── query-client.tsx # TanStack Query configuration
+  │   ├── utils.ts   # Utility functions (cn helper)
+  │   └── users/     # User-specific utilities
+  │       └── validations.ts # Zod schemas for user forms
   ├── types/         # TypeScript type definitions
   └── utils/         # Additional utility functions
+prisma/              # Database schema and migrations
+  └── schema.prisma  # Prisma schema with User model
 docs/
   └── concept.md     # Product concept and feature specifications
 ```
@@ -63,19 +86,72 @@ docs/
 - **ESLint**: Next.js core web vitals + TypeScript rules
 - **shadcn/ui**: New York style, Lucide icons, CSS variables enabled
 - **Path Aliases**: `@/` maps to src directory for clean imports
+- **Database**: PostgreSQL with Prisma ORM, soft delete pattern implemented
+- **Forms**: React Hook Form with Zod validation and shadcn/ui Form components
+- **State Management**: TanStack Query for server state with custom mutation hooks
 
-### Expected Future Structure
-When implementing the full application, expect these additional directories:
+## Established Patterns
+
+### TanStack Query Mutation Hooks Pattern
+```typescript
+// Custom hook with options support
+export function useCreateExample(options?: MutationOptions) {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    ...options, // Spread options first
+    mutationFn: (data) => serverAction(data),
+    onSuccess: (result, variables, context) => {
+      // Core hook functionality (cache management) always runs first
+      queryClient.refetchQueries({ queryKey: ["examples"] })
+      
+      // Then call component-specific callback
+      options?.onSuccess?.(result, variables, context)
+    },
+    onError: (error, variables, context) => {
+      options?.onError?.(error, variables, context)
+    },
+  })
+}
 ```
-prisma/              # Database schema and migrations
-  ├── schema.prisma  # Prisma schema definition
-  └── migrations/    # Database migration files
-src/lib/             # Additional library files
-  ├── db.ts          # Prisma client setup
-  ├── openai.ts      # OpenAI API configuration
-  ├── s3.ts          # AWS S3 client setup
-  └── validations.ts # Zod schemas for data validation
+
+### Server Actions Pattern
+```typescript
+// Server actions return consistent format
+export async function createExample(data: CreateData) {
+  try {
+    const result = await db.example.create({ data })
+    revalidatePath("/examples")
+    return { success: true, data: result }
+  } catch (error) {
+    return { success: false, error: "Error message" }
+  }
+}
 ```
+
+### Form Components with shadcn/ui
+```typescript
+// Use shadcn/ui Form components with React Hook Form + Zod
+const form = useForm<FormData>({
+  resolver: zodResolver(schema),
+  defaultValues: { ... }
+})
+
+const mutation = useMutation({
+  onSuccess: (result) => {
+    if (result.success) {
+      form.reset()
+      toast.success("Success message")
+    }
+  }
+})
+```
+
+### Soft Delete Implementation
+- Use `destroyed_at` timestamp field (nullable)
+- Filter queries with `destroyed_at: null` for active records
+- Provide restore functionality for soft-deleted records
+- Handle email uniqueness with restoration dialog pattern
 
 ## Development Notes
 

@@ -1,10 +1,11 @@
 import { ChefHat, ClipboardPenLine, ImagePlus, Link } from "lucide-react";
+import IconBackground from "../components/layout/icon-background";
 import { Button } from "../components/ui/button";
 import { cn } from "../lib/utils";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-1 items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+    <div className=" relative font-sans grid grid-rows-1 items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] items-center">
         <div className="flex flex-col items-center gap-2">
           <ChefHat className="w-10 h-10" />
@@ -33,6 +34,7 @@ export default function Home() {
           ))}
         </div>
       </main>
+      <IconBackground />
     </div>
   );
 }
