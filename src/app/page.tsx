@@ -5,10 +5,10 @@ import { cn } from "../lib/utils";
 
 export default function Home() {
   return (
-    <div className=" relative font-sans grid grid-rows-1 items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] items-center">
+    <div className="relative font-sans grid grid-rows-1 items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+      <main className="flex flex-col gap-10 items-center">
         <div className="flex flex-col items-center gap-2">
-          <ChefHat className="w-10 h-10" />
+          <ChefHat className="w-12 h-12" />
           <h1 className="text-4xl font-bold leading-none">platerly</h1>
         </div>
         <div className="flex">
