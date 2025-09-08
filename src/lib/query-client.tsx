@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
-import { useState } from "react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useState } from "react";
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -16,10 +16,10 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             retry: (failureCount, error: any) => {
               // Don't retry on 4xx errors
               if (error?.status >= 400 && error?.status < 500) {
-                return false
+                return false;
               }
               // Retry up to 3 times for other errors
-              return failureCount < 3
+              return failureCount < 3;
             },
           },
           mutations: {
@@ -27,16 +27,16 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
           },
         },
       })
-  )
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
       {children}
       <ReactQueryDevtools
         initialIsOpen={false}
-        position="bottom-right"
+        position="bottom"
         buttonPosition="bottom-right"
       />
     </QueryClientProvider>
-  )
+  );
 }

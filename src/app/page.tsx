@@ -1,6 +1,5 @@
 import { Input } from "@/components/ui/input";
 import { ChefHat } from "lucide-react";
-import Link from "next/link";
 
 export default function Home() {
   return (
@@ -14,15 +13,6 @@ export default function Home() {
           placeholder="Enter a recipe link"
           className="w-full max-w-md text-center"
         />
-        
-        <div className="mt-8">
-          <Link 
-            href="/admin/user" 
-            className="text-blue-600 hover:text-blue-800 underline"
-          >
-            Admin: Manage Users
-          </Link>
-        </div>
       </main>
     </div>
   );
