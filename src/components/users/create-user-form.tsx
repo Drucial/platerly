@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { User } from "@/generated/prisma";
 import { useCreateUser } from "@/hooks/user/use-create-user";
 import {
   createUserSchema,
@@ -17,12 +18,11 @@ import {
 } from "@/lib/users/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { User } from "@/generated/prisma";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { RestoreUserDialog } from "./restore-user-dialog";
 
-export function CreateUserForm() {
+export function CreateUserForm({ onSuccess }: { onSuccess: () => void }) {
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const [existingUser, setExistingUser] = useState<User | null>(null);
 
@@ -42,6 +42,7 @@ export function CreateUserForm() {
         toast.success("User created successfully", {
           description: `${result.user?.first_name} ${result.user?.last_name} has been added to the system.`,
         });
+        onSuccess();
       } else if (result.error === "EXISTING_DELETED_USER") {
         // Show restoration dialog
         setExistingUser(result.existingUser || null);

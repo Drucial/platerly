@@ -1,51 +1,73 @@
 "use client";
 
-import { CreateUserForm } from "@/components/users/create-user-form";
-import { UserList } from "@/components/users/user-list";
+import { AdminHeader } from "@/components/admin/admin-header";
+import { Button } from "@/components/ui/button";
+import { FullScreenError } from "@/components/ui/full-screen-error";
+import { FullScreenLoader } from "@/components/ui/full-screen-loader";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../../components/ui/card";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { useGetAllUsers } from "@/hooks/user/use-get-all-users";
+import { useState } from "react";
+import { CreateUserForm } from "../../../components/users/create-user-form";
+import { columns } from "./columns";
+import { DataTable } from "./data-table";
 
 export default function AdminUserPage() {
+  const [open, setOpen] = useState(false);
+  const { data, error, isLoading, refetch } = useGetAllUsers();
+
+  if (isLoading) {
+    return (
+      <FullScreenLoader
+        title="Getting users..."
+        description="Please wait while we load the users..."
+      />
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <FullScreenError
+        title="Error getting users"
+        description={error?.message || "An unexpected error occurred."}
+        action={<Button onClick={() => refetch()}>Retry</Button>}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">User Management</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Manage users, create new accounts, and handle user data
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left column - User List */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>Users</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <UserList />
-              </CardContent>
-            </Card>
+    <div className="container mx-auto py-10 space-y-6">
+      <AdminHeader
+        title="Users"
+        description="Manage users in the system"
+        onAdd={() => setOpen(true)}
+      />
+      <DataTable columns={columns} data={data.users || []} />
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Create User</SheetTitle>
+            <SheetDescription>
+              Create a new user in the system.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="px-4">
+            <CreateUserForm onSuccess={() => setOpen(false)} />
           </div>
-
-          {/* Right column - Create User Form */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>Create User</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CreateUserForm />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
+          <SheetFooter>
+            <SheetClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
