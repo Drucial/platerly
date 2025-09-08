@@ -1,4 +1,12 @@
-import { ChefHat, Shield, Users } from "lucide-react";
+import {
+  Book,
+  CalendarDays,
+  ChefHat,
+  Shield,
+  ShoppingCart,
+  Store,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import {
@@ -7,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Separator } from "../ui/separator";
 import { ModeToggle } from "../ui/theme-toggle";
 
 export default function NavBar() {
@@ -18,7 +27,7 @@ export default function NavBar() {
             <h1 className="text-2xl font-bold">platerly</h1>
           </Link>
         </div>
-        <nav className="flex items-center space-x-1">
+        <nav className="flex items-center space-x-1 h-8">
           {links.map((link) => {
             if (link.sublinks) {
               return (
@@ -53,6 +62,7 @@ export default function NavBar() {
               </Button>
             );
           })}
+          <Separator orientation="vertical" />
           <ModeToggle />
         </nav>
       </div>
@@ -65,6 +75,26 @@ const links = [
     href: "/",
     label: "Home",
     icon: ChefHat,
+  },
+  {
+    href: "/recipes",
+    label: "Recipes",
+    icon: Book,
+  },
+  {
+    href: "/pantry",
+    label: "Pantry",
+    icon: Store,
+  },
+  {
+    href: "/meal-plan",
+    label: "Meal Plan",
+    icon: CalendarDays,
+  },
+  {
+    href: "/grocery-list",
+    label: "Grocery List",
+    icon: ShoppingCart,
   },
   {
     href: "/admin",

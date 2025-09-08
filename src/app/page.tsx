@@ -6,10 +6,12 @@ import { cn } from "../lib/utils";
 export default function Home() {
   return (
     <div className="relative font-sans grid grid-rows-1 items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-10 items-center">
+      <main className="flex flex-col gap-8 items-center">
         <div className="flex flex-col items-center gap-2">
           <ChefHat className="w-12 h-12" />
-          <h1 className="text-4xl font-bold leading-none">platerly</h1>
+          <h1 className="text-[2.5rem] font-bold leading-none -mt-1">
+            platerly
+          </h1>
         </div>
         <div className="flex">
           {actionButtons.map((button) => (
@@ -47,7 +49,7 @@ const actionButtons = [
   },
   {
     icon: Link,
-    label: "connect a website",
+    label: "Connect a Link",
     className: "group-hover:w-[15ch]",
   },
   {

@@ -155,14 +155,26 @@ const mutation = useMutation({
 
 ## Development Notes
 
-The codebase is in early stages - currently showing the default Next.js template page. The actual Platerly features described in docs/concept.md need to be implemented.
+### Current Implementation Status
+- ✅ **User Management System** - Complete admin interface with CRUD operations
+- ✅ **Database Setup** - PostgreSQL with Prisma, User model with soft deletes
+- ✅ **Authentication Patterns** - Server actions, TanStack Query hooks, form validation
+- 🔄 **Recipe Features** - Not yet implemented (see docs/concept.md for specifications)
 
-When implementing new features:
-- Follow the shadcn/ui component patterns
-- Use the `cn()` utility from lib/utils.ts for conditional classes
-- Leverage Next.js App Router patterns with server actions for data mutations
-- Use TanStack Query for client-side data fetching and caching
-- Implement Prisma models following the recipe/meal planning domain
-- Use Motion/React for smooth page transitions and micro-animations
-- Maintain TypeScript strict mode compliance
-- Store environment variables for OpenAI API keys and AWS credentials in .env.local
+### When Implementing New Features
+- **Follow established patterns** documented above for consistency
+- **Use shadcn/ui components** with the Form pattern for all forms
+- **Implement TanStack Query hooks** following the established mutation hook pattern
+- **Create server actions** with consistent return format `{ success: boolean, data?, error? }`
+- **Use Zod schemas** in `src/lib/[domain]/validations.ts` for form validation
+- **Implement soft deletes** with `destroyed_at` field and restore functionality
+- **Use Sonner toast notifications** for user feedback
+- **Maintain TypeScript strict mode** compliance throughout
+- **Store environment variables** in `.env.local` (see template structure)
+
+### VSCode Configuration
+- **Format on save** enabled with Prettier
+- **Auto-organize imports** and remove unused imports on save
+- **ESLint auto-fix** on save
+- **2-space indentation** for all file types
+- **Recommended extensions** defined in `.vscode/extensions.json`
