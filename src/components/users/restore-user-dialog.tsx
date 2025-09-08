@@ -11,14 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { useRestoreUser } from "@/hooks/user/use-restore-user";
 import { toast } from "sonner";
+import { User } from "@/generated/prisma";
 
-interface User {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  destroyed_at: string | null;
-}
 
 interface RestoreUserDialogProps {
   open: boolean;
@@ -47,7 +41,7 @@ export function RestoreUserDialog({
         });
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error("Error restoring user", {
         description: error.message || "An unexpected error occurred.",
       });

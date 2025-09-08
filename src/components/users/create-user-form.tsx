@@ -17,13 +17,14 @@ import {
 } from "@/lib/users/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { User } from "@/generated/prisma";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { RestoreUserDialog } from "./restore-user-dialog";
 
 export function CreateUserForm() {
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
-  const [existingUser, setExistingUser] = useState<any>(null);
+  const [existingUser, setExistingUser] = useState<User | null>(null);
 
   const form = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
@@ -43,7 +44,7 @@ export function CreateUserForm() {
         });
       } else if (result.error === "EXISTING_DELETED_USER") {
         // Show restoration dialog
-        setExistingUser(result.existingUser);
+        setExistingUser(result.existingUser || null);
         setShowRestoreDialog(true);
       } else {
         toast.error("Failed to create user", {
@@ -51,7 +52,7 @@ export function CreateUserForm() {
         });
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error("Error creating user", {
         description: error.message || "An unexpected error occurred.",
       });

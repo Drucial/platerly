@@ -53,7 +53,11 @@ This project uses **pnpm** as the package manager (confirmed by presence of pnpm
 ```
 src/                 # Source code directory (Next.js 13+ src pattern)
   ├── actions/       # Next.js Server Actions
-  │   └── user.ts    # User CRUD operations
+  │   ├── user.ts    # User CRUD operations
+  │   ├── image.ts   # Image CRUD operations  
+  │   ├── ingredient.ts # Ingredient CRUD operations
+  │   ├── ingredient-location.ts # IngredientLocation CRUD operations
+  │   └── ingredient-type.ts # IngredientType CRUD operations
   ├── app/           # Next.js App Router pages and layouts
   │   ├── admin/     # Admin pages
   │   │   └── user/  # User management admin page
@@ -63,7 +67,7 @@ src/                 # Source code directory (Next.js 13+ src pattern)
   ├── components/    # Reusable React components
   │   ├── ui/        # shadcn/ui components (Button, Form, Dialog, etc.)
   │   └── users/     # User-specific components
-  ├── generated/     # Generated files (Prisma client)
+  ├── generated/     # Generated files (Prisma client) - EXCLUDED FROM LINT
   │   └── prisma/    # Generated Prisma client
   ├── hooks/         # Custom React hooks
   │   └── user/      # User-related TanStack Query hooks
@@ -76,14 +80,14 @@ src/                 # Source code directory (Next.js 13+ src pattern)
   ├── types/         # TypeScript type definitions
   └── utils/         # Additional utility functions
 prisma/              # Database schema and migrations
-  └── schema.prisma  # Prisma schema with User model
+  └── schema.prisma  # Prisma schema with User, Image, Ingredient models
 docs/
   └── concept.md     # Product concept and feature specifications
 ```
 
 ### Key Configurations
 - **TypeScript**: Strict mode, ES2017 target, path mapping (`@/*` → `./src/*`)
-- **ESLint**: Next.js core web vitals + TypeScript rules
+- **ESLint**: Next.js core web vitals + TypeScript rules, `src/generated/**` excluded
 - **shadcn/ui**: New York style, Lucide icons, CSS variables enabled
 - **Path Aliases**: `@/` maps to src directory for clean imports
 - **Database**: PostgreSQL with Prisma ORM, soft delete pattern implemented
@@ -158,8 +162,9 @@ const mutation = useMutation({
 ### Current Implementation Status
 - ✅ **User Management System** - Complete admin interface with CRUD operations
 - ✅ **Database Setup** - PostgreSQL with Prisma, User model with soft deletes
+- ✅ **Recipe Data Models** - Image, Ingredient, IngredientLocation, IngredientType models with server actions
 - ✅ **Authentication Patterns** - Server actions, TanStack Query hooks, form validation
-- 🔄 **Recipe Features** - Not yet implemented (see docs/concept.md for specifications)
+- 🔄 **Recipe Features** - Data layer complete, UI not yet implemented (see docs/concept.md for specifications)
 
 ### When Implementing New Features
 - **Follow established patterns** documented above for consistency
@@ -171,6 +176,14 @@ const mutation = useMutation({
 - **Use Sonner toast notifications** for user feedback
 - **Maintain TypeScript strict mode** compliance throughout
 - **Store environment variables** in `.env.local` (see template structure)
+
+### TypeScript Guidelines
+- **NEVER use `any` type** - Always prefer proper typing, `unknown`, or union types
+- **Avoid type assertions (`as`)** wherever possible - Use type guards and proper type narrowing instead
+- **Prefer `type` over `interface`** for simple object shapes and unions - Use `interface` only for extensible contracts
+- **Use proper type guards** for runtime type checking instead of type assertions
+- **Import types from Prisma client** using `import { ModelName } from "@/generated/prisma"`
+- **Use `unknown` for error parameters** in callbacks and properly narrow the type with guards
 
 ### VSCode Configuration
 - **Format on save** enabled with Prettier

@@ -25,3 +25,61 @@ model User {
 
   @@map("users")
 }
+
+model Image {
+  id          Int       @id @default(autoincrement())
+  name        String
+  url         String
+  description String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  destroyed_at DateTime?
+
+  ingredients Ingredient[]
+
+  @@map("images")
+}
+
+model IngredientLocation {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  destroyed_at DateTime?
+
+  ingredients Ingredient[]
+
+  @@map("ingredient_locations")
+}
+
+model IngredientType {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  destroyed_at DateTime?
+
+  ingredients Ingredient[]
+
+  @@map("ingredient_types")
+}
+
+model Ingredient {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  destroyed_at DateTime?
+
+  image_id    Int?
+  image       Image?    @relation(fields: [image_id], references: [id])
+
+  location_id Int?
+  location    IngredientLocation? @relation(fields: [location_id], references: [id])
+
+  type_id     Int?
+  type        IngredientType? @relation(fields: [type_id], references: [id])
+
+  @@map("ingredients")
+}

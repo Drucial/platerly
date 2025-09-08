@@ -27,7 +27,7 @@ export function UserList() {
       }
       setDeletingId(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error("Error deleting user", {
         description: error.message || "An unexpected error occurred.",
       });
