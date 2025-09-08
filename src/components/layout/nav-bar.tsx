@@ -2,9 +2,13 @@ import {
   Book,
   CalendarDays,
   ChefHat,
+  Image,
+  MapPin,
   Shield,
+  ShoppingBasket,
   ShoppingCart,
   Store,
+  Tag,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -105,6 +109,26 @@ const links = [
         href: "/admin/user",
         label: "Users",
         icon: Users,
+      },
+      {
+        href: "/admin/image",
+        label: "Images",
+        icon: Image,
+      },
+      {
+        href: "/admin/ingredient",
+        label: "Ingredients",
+        icon: ShoppingBasket,
+      },
+      {
+        href: "/admin/ingredient-location",
+        label: "Ingredient Locations",
+        icon: MapPin,
+      },
+      {
+        href: "/admin/ingredient-type",
+        label: "Ingredient Types",
+        icon: Tag,
       },
     ],
   },
