@@ -22,10 +22,10 @@ import { NoResults } from "./no-results";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  onEdit?: (id: any) => void;
-  onDelete?: (id: any) => void;
-  onRestore?: (id: any) => void;
-  getId?: (row: TData) => any;
+  onEdit?: (id: number) => void;
+  onDelete?: (id: number) => void;
+  onRestore?: (id: number) => void;
+  getId?: (row: TData) => number;
   showRestoreAction?: boolean;
 }
 
@@ -35,7 +35,7 @@ export function DataTable<TData, TValue>({
   onEdit,
   onDelete,
   onRestore,
-  getId = (row: any) => row.id,
+  getId = (row: TData) => (row as unknown as { id: number }).id,
   showRestoreAction = false,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
