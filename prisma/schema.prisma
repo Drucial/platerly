@@ -23,6 +23,8 @@ model User {
   updated_at  DateTime  @updatedAt
   destroyed_at DateTime?
 
+  recipes     Recipe[]
+
   @@map("users")
 }
 
@@ -35,7 +37,9 @@ model Image {
   updated_at  DateTime  @updatedAt
   destroyed_at DateTime?
 
-  ingredients Ingredient[]
+  ingredients         Ingredient[]
+  recipes_as_image    Recipe[] @relation("RecipeImage")
+  recipes_as_source   Recipe[] @relation("RecipeSourceImage")
 
   @@map("images")
 }
@@ -81,5 +85,113 @@ model Ingredient {
   type_id     Int?
   type        IngredientType? @relation(fields: [type_id], references: [id])
 
+  recipe_ingredients RecipeIngredient[]
+
   @@map("ingredients")
+}
+
+model Recipe {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  prep_time   String?   // Stored as "HH:MM" format
+  cook_time   String?   // Stored as "HH:MM" format
+  url         String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  destroyed_at DateTime?
+
+  user_id     Int
+  user        User      @relation(fields: [user_id], references: [id])
+
+  image_id    Int?
+  image       Image?    @relation(fields: [image_id], references: [id], name: "RecipeImage")
+
+  source_image_id Int?
+  source_image    Image? @relation(fields: [source_image_id], references: [id], name: "RecipeSourceImage")
+
+  cuisine_type_id Int?
+  cuisine_type    CuisineType? @relation(fields: [cuisine_type_id], references: [id])
+
+  steps               Step[]
+  recipe_ingredients  RecipeIngredient[]
+  recipe_tags         RecipeTag[]
+
+  @@map("recipes")
+}
+
+model Step {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  order       Int       // Step order within recipe
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  destroyed_at DateTime?
+
+  recipe_id   Int
+  recipe      Recipe    @relation(fields: [recipe_id], references: [id])
+
+  @@map("steps")
+}
+
+model CuisineType {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  destroyed_at DateTime?
+
+  recipes     Recipe[]
+
+  @@map("cuisine_types")
+}
+
+model Tag {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  destroyed_at DateTime?
+
+  recipe_tags RecipeTag[]
+
+  @@map("tags")
+}
+
+model RecipeIngredient {
+  id          Int       @id @default(autoincrement())
+  quantity    Float?    // Amount of ingredient
+  unit        String?   // Unit of measurement (cups, tsp, etc.)
+  notes       String?   // Additional notes for this ingredient in recipe
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  destroyed_at DateTime?
+
+  recipe_id     Int
+  recipe        Recipe     @relation(fields: [recipe_id], references: [id])
+
+  ingredient_id Int
+  ingredient    Ingredient @relation(fields: [ingredient_id], references: [id])
+
+  @@unique([recipe_id, ingredient_id]) // Prevent duplicate ingredients per recipe
+  @@map("recipe_ingredients")
+}
+
+model RecipeTag {
+  id          Int       @id @default(autoincrement())
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  destroyed_at DateTime?
+
+  recipe_id   Int
+  recipe      Recipe    @relation(fields: [recipe_id], references: [id])
+
+  tag_id      Int
+  tag         Tag       @relation(fields: [tag_id], references: [id])
+
+  @@unique([recipe_id, tag_id]) // Prevent duplicate tags per recipe
+  @@map("recipe_tags")
 }
