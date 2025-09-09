@@ -5,7 +5,7 @@ import { getDeletedRecipes } from "@/actions/recipe"
 
 export function useGetDeletedRecipes(options?: { enabled?: boolean }) {
   return useQuery({
-    queryKey: ["deleted-recipes"],
+    queryKey: ["recipes", "deleted"],
     queryFn: getDeletedRecipes,
     enabled: options?.enabled !== false,
     staleTime: 2 * 60 * 1000, // 2 minutes

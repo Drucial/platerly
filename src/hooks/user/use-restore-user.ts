@@ -20,8 +20,8 @@ export function useRestoreUser(options?: RestoreUserMutationOptions) {
     ...options,
     mutationFn: (id: number) => restoreUser(id),
     onSuccess: (result, id, context) => {
-      // Always refetch queries immediately (core hook functionality)
-      queryClient.refetchQueries({ queryKey: ["users"] });
+      // Always invalidate queries for consistency (core hook functionality)
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["user", id] });
       queryClient.invalidateQueries({ queryKey: ["users", "deleted"] });
 

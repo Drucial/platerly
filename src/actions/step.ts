@@ -184,3 +184,53 @@ export async function reorderSteps(recipeId: number, stepOrders: { id: number; o
     return { success: false, error: "Failed to reorder steps" };
   }
 }
+
+export async function bulkUpdateSteps(
+  recipeId: number,
+  steps: Array<{
+    name: string;
+    description: string;
+    order: number;
+  }>
+) {
+  try {
+    const newSteps = await db.$transaction(async (tx) => {
+      // Soft delete existing steps
+      await tx.step.updateMany({
+        where: {
+          recipe_id: recipeId,
+          destroyed_at: null,
+        },
+        data: {
+          destroyed_at: new Date(),
+          updated_at: new Date(),
+        },
+      });
+
+      // Create new steps
+      const createdSteps = await Promise.all(
+        steps.map(step =>
+          tx.step.create({
+            data: {
+              recipe_id: recipeId,
+              ...step,
+            },
+            include: {
+              recipe: true,
+            },
+          })
+        )
+      );
+
+      return createdSteps;
+    });
+
+    revalidatePath("/recipes");
+    revalidatePath("/admin/recipe");
+    revalidatePath(`/recipes/${recipeId}`);
+    return { success: true, steps: newSteps };
+  } catch (error) {
+    console.error("Error bulk updating steps:", error);
+    return { success: false, error: "Failed to bulk update steps" };
+  }
+}

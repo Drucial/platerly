@@ -4,6 +4,7 @@ import {
   Book,
   CalendarDays,
   ChefHat,
+  ChefHat as Cuisine,
   Image,
   MapPin,
   Shield,
@@ -12,6 +13,7 @@ import {
   Store,
   Tag,
   Users,
+  Utensils,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
@@ -126,6 +128,21 @@ const links = [
         icon: Users,
       },
       {
+        href: "/admin/recipe",
+        label: "Recipes",
+        icon: Book,
+      },
+      {
+        href: "/admin/cuisine-type",
+        label: "Cuisine Types",
+        icon: Cuisine,
+      },
+      {
+        href: "/admin/tag",
+        label: "Tags",
+        icon: Tag,
+      },
+      {
         href: "/admin/image",
         label: "Images",
         icon: Image,
@@ -143,7 +160,7 @@ const links = [
       {
         href: "/admin/ingredient-type",
         label: "Ingredient Types",
-        icon: Tag,
+        icon: Utensils,
       },
     ],
   },

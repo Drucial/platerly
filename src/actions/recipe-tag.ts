@@ -178,3 +178,54 @@ export async function removeRecipeTagByIds(recipeId: number, tagId: number) {
     return { success: false, error: "Failed to remove recipe tag" };
   }
 }
+
+export async function createOrRestoreRecipeTag(data: CreateRecipeTagData) {
+  try {
+    // First, check if a soft-deleted recipe tag exists
+    const existingDeleted = await db.recipeTag.findFirst({
+      where: {
+        recipe_id: data.recipe_id,
+        tag_id: data.tag_id,
+        destroyed_at: {
+          not: null,
+        },
+      },
+    });
+
+    let recipeTag;
+
+    if (existingDeleted) {
+      // Restore the soft-deleted tag
+      recipeTag = await db.recipeTag.update({
+        where: {
+          id: existingDeleted.id,
+        },
+        data: {
+          destroyed_at: null,
+          updated_at: new Date(),
+        },
+        include: {
+          recipe: true,
+          tag: true,
+        },
+      });
+    } else {
+      // Create a new recipe tag
+      recipeTag = await db.recipeTag.create({
+        data,
+        include: {
+          recipe: true,
+          tag: true,
+        },
+      });
+    }
+
+    revalidatePath("/recipes");
+    revalidatePath("/admin/recipe");
+    revalidatePath(`/recipes/${data.recipe_id}`);
+    return { success: true, recipeTag };
+  } catch (error) {
+    console.error("Error creating or restoring recipe tag:", error);
+    return { success: false, error: "Failed to create or restore recipe tag" };
+  }
+}

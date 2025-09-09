@@ -17,9 +17,9 @@ export function useUpdateRecipe(options?: UpdateRecipeMutationOptions) {
     mutationFn: ({ id, data }: { id: number; data: UpdateRecipeData }) => 
       updateRecipe(id, data),
     onSuccess: (result, variables, context) => {
-      // Always refetch recipes list and specific recipe (core hook functionality)
-      queryClient.refetchQueries({ queryKey: ["recipes"] })
-      queryClient.refetchQueries({ queryKey: ["recipe", variables.id] })
+      // Always invalidate recipes cache (core hook functionality)
+      queryClient.invalidateQueries({ queryKey: ["recipes"] })
+      queryClient.invalidateQueries({ queryKey: ["recipe", variables.id] })
       
       // Call custom onSuccess if provided (component-specific logic)
       options?.onSuccess?.(result, variables, context)

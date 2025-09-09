@@ -184,6 +184,22 @@ export async function getAllRecipes() {
         image: true,
         source_image: true,
         cuisine_type: true,
+        steps: {
+          where: { destroyed_at: null },
+          orderBy: { order: "asc" },
+        },
+        recipe_ingredients: {
+          where: { destroyed_at: null },
+          include: {
+            ingredient: true,
+          },
+        },
+        recipe_tags: {
+          where: { destroyed_at: null },
+          include: {
+            tag: true,
+          },
+        },
         _count: {
           select: {
             steps: { where: { destroyed_at: null } },
@@ -264,6 +280,22 @@ export async function getRecipesByUserId(userId: number) {
         image: true,
         source_image: true,
         cuisine_type: true,
+        steps: {
+          where: { destroyed_at: null },
+          orderBy: { order: "asc" },
+        },
+        recipe_ingredients: {
+          where: { destroyed_at: null },
+          include: {
+            ingredient: true,
+          },
+        },
+        recipe_tags: {
+          where: { destroyed_at: null },
+          include: {
+            tag: true,
+          },
+        },
         _count: {
           select: {
             steps: { where: { destroyed_at: null } },

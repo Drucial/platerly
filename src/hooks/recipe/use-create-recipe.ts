@@ -16,8 +16,8 @@ export function useCreateRecipe(options?: CreateRecipeMutationOptions) {
     ...options,
     mutationFn: (data: CreateRecipeData) => createRecipe(data),
     onSuccess: (result, variables, context) => {
-      // Always refetch recipes list immediately (core hook functionality)
-      queryClient.refetchQueries({ queryKey: ["recipes"] })
+      // Always invalidate recipes cache (core hook functionality)
+      queryClient.invalidateQueries({ queryKey: ["recipes"] })
       
       // Call custom onSuccess if provided (component-specific logic)
       options?.onSuccess?.(result, variables, context)

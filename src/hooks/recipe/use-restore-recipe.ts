@@ -16,9 +16,10 @@ export function useRestoreRecipe(options?: RestoreRecipeMutationOptions) {
     ...options,
     mutationFn: (id: number) => restoreRecipe(id),
     onSuccess: (result, variables, context) => {
-      // Always refetch recipes list (core hook functionality)
-      queryClient.refetchQueries({ queryKey: ["recipes"] })
-      queryClient.refetchQueries({ queryKey: ["recipe", variables] })
+      // Always invalidate recipes cache (core hook functionality)
+      queryClient.invalidateQueries({ queryKey: ["recipes"] })
+      queryClient.invalidateQueries({ queryKey: ["recipes", "deleted"] })
+      queryClient.invalidateQueries({ queryKey: ["recipe", variables] })
       
       // Call custom onSuccess if provided (component-specific logic)
       options?.onSuccess?.(result, variables, context)
