@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Book,
   CalendarDays,
@@ -12,6 +14,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -23,8 +26,20 @@ import { Separator } from "../ui/separator";
 import { ModeToggle } from "../ui/theme-toggle";
 
 export default function NavBar() {
+  // Once rendered set a css variable for teh height of the nav bar
+  useEffect(() => {
+    const navbar = document.querySelector(".navbar");
+    if (navbar) {
+      document.documentElement.style.setProperty(
+        "--navbar-height",
+        `${navbar.clientHeight}px`
+      );
+    }
+    document.documentElement.style.setProperty("--navbar-height", "4rem");
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm border-b">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm border-b">
       <div className="container space-x-4 flex justify-between items-center mx-auto">
         <div className="flex h-16 items-center">
           <Link href="/">

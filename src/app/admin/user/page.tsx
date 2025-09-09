@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminHeader } from "@/components/admin/admin-header";
+import { DataTable } from "@/components/admin/data-table";
 import { Button } from "@/components/ui/button";
 import { FullScreenError } from "@/components/ui/full-screen-error";
 import { FullScreenLoader } from "@/components/ui/full-screen-loader";
@@ -17,7 +18,6 @@ import { useGetAllUsers } from "@/hooks/user/use-get-all-users";
 import { useState } from "react";
 import { CreateUserForm } from "../../../components/users/create-user-form";
 import { columns } from "./columns";
-import { DataTable } from "./data-table";
 
 export default function AdminUserPage() {
   const [open, setOpen] = useState(false);
@@ -43,7 +43,7 @@ export default function AdminUserPage() {
   }
 
   return (
-    <div className="container mx-auto py-10 space-y-6">
+    <div className="container mx-auto py-10 space-y-6 h-[calc(100svh-var(--navbar-height))] mt-[var(--navbar-height)] flex flex-col">
       <AdminHeader
         title="Users"
         description="Manage users in the system"
