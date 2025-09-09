@@ -1,19 +1,19 @@
-"use server"
+"use server";
 
-import { db } from "@/lib/db"
-import { revalidatePath } from "next/cache"
+import { db } from "@/lib/db";
+import { revalidatePath } from "next/cache";
 
 export type CreateUserData = {
-  first_name: string
-  last_name: string
-  email: string
-}
+  first_name: string;
+  last_name: string;
+  email: string;
+};
 
 export type UpdateUserData = {
-  first_name?: string
-  last_name?: string
-  email?: string
-}
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+};
 
 export async function createUser(data: CreateUserData) {
   try {
@@ -23,14 +23,14 @@ export async function createUser(data: CreateUserData) {
         email: data.email,
         destroyed_at: { not: null }, // Only soft-deleted users
       },
-    })
+    });
 
     if (existingDeletedUser) {
       return {
         success: false,
         error: "EXISTING_DELETED_USER",
         existingUser: existingDeletedUser,
-      }
+      };
     }
 
     // Check for active user with same email
@@ -39,13 +39,13 @@ export async function createUser(data: CreateUserData) {
         email: data.email,
         destroyed_at: null, // Active users
       },
-    })
+    });
 
     if (existingActiveUser) {
       return {
         success: false,
         error: "Email already exists",
-      }
+      };
     }
 
     // Create new user
@@ -55,13 +55,13 @@ export async function createUser(data: CreateUserData) {
         last_name: data.last_name,
         email: data.email,
       },
-    })
+    });
 
-    revalidatePath("/users")
-    return { success: true, user }
+    revalidatePath("/users");
+    return { success: true, user };
   } catch (error) {
-    console.error("Error creating user:", error)
-    return { success: false, error: "Failed to create user" }
+    console.error("Error creating user:", error);
+    return { success: false, error: "Failed to create user" };
   }
 }
 
@@ -72,16 +72,16 @@ export async function getUserById(id: number) {
         id,
         destroyed_at: null, // Only get non-deleted users
       },
-    })
+    });
 
     if (!user) {
-      return { success: false, error: "User not found" }
+      return { success: false, error: "User not found" };
     }
 
-    return { success: true, user }
+    return { success: true, user };
   } catch (error) {
-    console.error("Error getting user:", error)
-    return { success: false, error: "Failed to get user" }
+    console.error("Error getting user:", error);
+    return { success: false, error: "Failed to get user" };
   }
 }
 
@@ -96,14 +96,14 @@ export async function updateUser(id: number, data: UpdateUserData) {
         ...data,
         updated_at: new Date(),
       },
-    })
+    });
 
-    revalidatePath("/users")
-    revalidatePath(`/users/${id}`)
-    return { success: true, user }
+    revalidatePath("/users");
+    revalidatePath(`/users/${id}`);
+    return { success: true, user };
   } catch (error) {
-    console.error("Error updating user:", error)
-    return { success: false, error: "Failed to update user" }
+    console.error("Error updating user:", error);
+    return { success: false, error: "Failed to update user" };
   }
 }
 
@@ -119,14 +119,14 @@ export async function deleteUser(id: number) {
         destroyed_at: new Date(),
         updated_at: new Date(),
       },
-    })
+    });
 
-    revalidatePath("/users")
-    revalidatePath(`/users/${id}`)
-    return { success: true, user }
+    revalidatePath("/users");
+    revalidatePath(`/users/${id}`);
+    return { success: true, user };
   } catch (error) {
-    console.error("Error deleting user:", error)
-    return { success: false, error: "Failed to delete user" }
+    console.error("Error deleting user:", error);
+    return { success: false, error: "Failed to delete user" };
   }
 }
 
@@ -139,12 +139,12 @@ export async function getAllUsers() {
       orderBy: {
         created_at: "desc",
       },
-    })
+    });
 
-    return { success: true, users }
+    return { success: true, users };
   } catch (error) {
-    console.error("Error getting users:", error)
-    return { success: false, error: "Failed to get users" }
+    console.error("Error getting users:", error);
+    return { success: false, error: "Failed to get users" };
   }
 }
 
@@ -159,14 +159,14 @@ export async function restoreUser(id: number) {
         destroyed_at: null,
         updated_at: new Date(),
       },
-    })
+    });
 
-    revalidatePath("/users")
-    revalidatePath(`/users/${id}`)
-    return { success: true, user }
+    revalidatePath("/users");
+    revalidatePath(`/users/${id}`);
+    return { success: true, user };
   } catch (error) {
-    console.error("Error restoring user:", error)
-    return { success: false, error: "Failed to restore user" }
+    console.error("Error restoring user:", error);
+    return { success: false, error: "Failed to restore user" };
   }
 }
 
@@ -181,11 +181,11 @@ export async function getDeletedUsers() {
       orderBy: {
         destroyed_at: "desc",
       },
-    })
+    });
 
-    return { success: true, users }
+    return { success: true, users };
   } catch (error) {
-    console.error("Error getting deleted users:", error)
-    return { success: false, error: "Failed to get deleted users" }
+    console.error("Error getting deleted users:", error);
+    return { success: false, error: "Failed to get deleted users" };
   }
 }
