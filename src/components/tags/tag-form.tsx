@@ -18,7 +18,6 @@ import { useCreateTag } from "@/hooks/tag/use-create-tag";
 import { useGetTag } from "@/hooks/tag/use-get-tag";
 import { useUpdateTag } from "@/hooks/tag/use-update-tag";
 import { useEffect } from "react";
-import { toast } from "sonner";
 
 const tagFormSchema = z.object({
   name: z
@@ -53,44 +52,16 @@ export function TagForm({ mode, tagId, onSuccess }: TagFormProps) {
   });
 
   const createTagMutation = useCreateTag({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Tag created successfully", {
-          description: `${result.tag?.name} has been created.`,
-        });
-        form.reset();
-        onSuccess?.();
-      } else {
-        toast.error("Failed to create tag", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast.error("Error creating tag", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
+    adminHandlers: {
+      closeSheet: () => onSuccess?.(),
+      resetForm: () => form.reset()
+    }
   });
 
   const updateTagMutation = useUpdateTag({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Tag updated successfully", {
-          description: `${result.tag?.name} has been updated.`,
-        });
-        onSuccess?.();
-      } else {
-        toast.error("Failed to update tag", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast.error("Error updating tag", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
+    adminHandlers: {
+      closeSheet: () => onSuccess?.()
+    }
   });
 
   useEffect(() => {

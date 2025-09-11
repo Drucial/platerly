@@ -1,31 +1,25 @@
-"use client"
-
-import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query"
+import { createAdminDeleteHook } from "@/utils/mutations/hooks"
 import { deleteTag } from "@/actions/tag"
+import type { AdminMutationResult } from "@/utils/mutations/mutations"
 
-type DeleteTagMutationOptions = UseMutationOptions<
-  Awaited<ReturnType<typeof deleteTag>>,
-  Error,
-  number
->
-
-export function useDeleteTag(options?: DeleteTagMutationOptions) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    ...options,
-    mutationFn: (id: number) => deleteTag(id),
-    onSuccess: (result, variables, context) => {
-      // Always refetch tags list (core hook functionality)
-      queryClient.refetchQueries({ queryKey: ["tags"] })
-      queryClient.refetchQueries({ queryKey: ["tag", variables] })
-      
-      // Call custom onSuccess if provided (component-specific logic)
-      options?.onSuccess?.(result, variables, context)
-    },
-    onError: (error, variables, context) => {
-      // Call custom onError if provided
-      options?.onError?.(error, variables, context)
-    },
-  })
+type DeleteTagResult = AdminMutationResult & {
+  tag?: {
+    id: number
+    name: string
+    description: string
+    created_at: Date
+    updated_at: Date
+    destroyed_at: Date | null
+  }
 }
+
+const tagConfig = {
+  entityName: "Tag",
+  queryKey: "tags",
+  displayNameFn: (tag: unknown) => (tag as { name: string }).name
+}
+
+export const useDeleteTag = createAdminDeleteHook<DeleteTagResult>(
+  tagConfig,
+  deleteTag
+)

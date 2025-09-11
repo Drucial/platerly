@@ -21,7 +21,6 @@ import { useGetAllRecipes } from "@/hooks/recipe/use-get-all-recipes";
 import { useGetDeletedRecipes } from "@/hooks/recipe/use-get-deleted-recipes";
 import { useRestoreRecipe } from "@/hooks/recipe/use-restore-recipe";
 import { useState } from "react";
-import { toast } from "sonner";
 import { EditSheet } from "../../../components/recipes/edit-sheet";
 import { columns } from "./columns";
 
@@ -43,49 +42,17 @@ export default function AdminRecipePage() {
   } = useGetDeletedRecipes();
 
   const restoreRecipeMutation = useRestoreRecipe({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Recipe restored successfully", {
-          description: `${result.recipe?.name} has been restored.`,
-        });
-      } else {
-        toast.error("Failed to restore recipe", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setRestoreDialogOpen(false);
-      setRestoringRecipeId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error restoring recipe", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setRestoreDialogOpen(false);
-      setRestoringRecipeId(null);
-    },
+    adminHandlers: {
+      closeRestoreDialog: () => setRestoreDialogOpen(false),
+      resetRestoreId: () => setRestoringRecipeId(null)
+    }
   });
 
   const deleteRecipeMutation = useDeleteRecipe({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Recipe deleted successfully", {
-          description: `${result.recipe?.name} has been moved to trash.`,
-        });
-      } else {
-        toast.error("Failed to delete recipe", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setDeleteDialogOpen(false);
-      setDeletingRecipeId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error deleting recipe", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setDeleteDialogOpen(false);
-      setDeletingRecipeId(null);
-    },
+    adminHandlers: {
+      closeDeleteDialog: () => setDeleteDialogOpen(false),
+      resetDeleteId: () => setDeletingRecipeId(null)
+    }
   });
 
   const handleDeleteRecipe = () => {

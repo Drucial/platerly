@@ -17,7 +17,6 @@ import { useCreateIngredientLocation } from "@/hooks/ingredient-location/use-cre
 import { useGetIngredientLocation } from "@/hooks/ingredient-location/use-get-ingredient-location";
 import { useUpdateIngredientLocation } from "@/hooks/ingredient-location/use-update-ingredient-location";
 import { useEffect } from "react";
-import { toast } from "sonner";
 
 const ingredientLocationFormSchema = z.object({
   name: z
@@ -47,44 +46,16 @@ export function IngredientLocationForm({ mode, ingredientLocationId, onSuccess }
   });
 
   const createIngredientLocationMutation = useCreateIngredientLocation({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient location created successfully", {
-          description: `${result.location?.name} has been created.`,
-        });
-        form.reset();
-        onSuccess?.();
-      } else {
-        toast.error("Failed to create ingredient location", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast.error("Error creating ingredient location", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
+    adminHandlers: {
+      closeSheet: () => onSuccess?.(),
+      resetForm: () => form.reset()
+    }
   });
 
   const updateIngredientLocationMutation = useUpdateIngredientLocation({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient location updated successfully", {
-          description: `${result.location?.name} has been updated.`,
-        });
-        onSuccess?.();
-      } else {
-        toast.error("Failed to update ingredient location", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast.error("Error updating ingredient location", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
+    adminHandlers: {
+      closeSheet: () => onSuccess?.()
+    }
   });
 
   useEffect(() => {

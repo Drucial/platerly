@@ -1,30 +1,35 @@
 "use client"
 
-import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query"
 import { createCuisineType, type CreateCuisineTypeData } from "@/actions/cuisine-type"
+import { createAdminCreateHook } from "@/utils/mutations/hooks"
+import { createCreateHook } from "@/utils/mutations"
+import type { AdminMutationResult, MutationResult } from "@/utils/mutations/mutations"
 
-type CreateCuisineTypeMutationOptions = UseMutationOptions<
-  Awaited<ReturnType<typeof createCuisineType>>,
-  Error,
-  CreateCuisineTypeData
->
+type CreateCuisineTypeResult = MutationResult & {
+  cuisineType?: { id: number; name: string }
+}
 
-export function useCreateCuisineType(options?: CreateCuisineTypeMutationOptions) {
-  const queryClient = useQueryClient()
+const cuisineTypeConfig = {
+  entityName: "Cuisine Type",
+  queryKey: "cuisine-types",
+  displayNameFn: (type: unknown) => (type as { name: string }).name
+}
 
-  return useMutation({
-    ...options,
-    mutationFn: (data: CreateCuisineTypeData) => createCuisineType(data),
-    onSuccess: (result, variables, context) => {
-      // Always refetch cuisine types list immediately (core hook functionality)
-      queryClient.refetchQueries({ queryKey: ["cuisine-types"] })
-      
-      // Call custom onSuccess if provided (component-specific logic)
-      options?.onSuccess?.(result, variables, context)
-    },
-    onError: (error, variables, context) => {
-      // Call custom onError if provided
-      options?.onError?.(error, variables, context)
-    },
+// Flexible hook that can be used in both admin and user contexts
+const baseCreateCuisineTypeHook = createCreateHook<CreateCuisineTypeResult, CreateCuisineTypeData>(
+  cuisineTypeConfig,
+  createCuisineType
+)
+
+// Default export for general use (uses "user" notification style)
+export const useCreateCuisineType = (options?: { notificationStyle?: "admin" | "user" | "none" }) => {
+  return baseCreateCuisineTypeHook({
+    notificationStyle: options?.notificationStyle || "user"
   })
 }
+
+// Admin-specific variant with admin styling and handlers
+export const useCreateCuisineTypeAdmin = createAdminCreateHook<AdminMutationResult & CreateCuisineTypeResult, CreateCuisineTypeData>(
+  cuisineTypeConfig,
+  createCuisineType
+)

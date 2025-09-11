@@ -79,6 +79,7 @@ src/                 # Source code directory (Next.js 13+ src pattern)
   │       └── validations.ts # Zod schemas for user forms
   ├── types/         # TypeScript type definitions
   └── utils/         # Additional utility functions
+      └── mutations/ # Standardized mutation utilities for all contexts
 prisma/              # Database schema and migrations
   └── schema.prisma  # Prisma schema with User, Image, Ingredient models
 docs/
@@ -96,9 +97,70 @@ docs/
 
 ## Established Patterns
 
-### TanStack Query Mutation Hooks Pattern
+### Standardized Mutation Hooks Pattern
+**PREFERRED APPROACH** - Use this pattern for all CRUD operations (admin and user contexts):
+
 ```typescript
-// Custom hook with options support
+// Entity-specific config (shared across all hooks for the entity)
+const entityConfig = {
+  entityName: "User",
+  queryKey: "users",
+  displayNameFn: (user: unknown) => {
+    const u = user as { first_name: string; last_name: string }
+    return `${u.first_name} ${u.last_name}`
+  }
+}
+
+// Create hook using generalized factory
+export const useDeleteUser = createDeleteHook<DeleteUserResult>(
+  entityConfig,
+  deleteUser
+)
+
+// Usage in admin pages (admin-style notifications with descriptions)
+const deleteUserMutation = useDeleteUser({
+  dialogHandlers: {
+    closeDeleteDialog: () => setDeleteDialogOpen(false),
+    resetDeleteId: () => setDeletingUserId(null)
+  },
+  notificationStyle: "admin"
+})
+
+// Usage in user-facing pages (simpler notifications without descriptions)
+const deleteUserMutation = useDeleteUser({
+  notificationStyle: "user"
+})
+
+// Usage without any notifications
+const deleteUserMutation = useDeleteUser({
+  notificationStyle: "none"
+})
+```
+
+**Available Hook Factories:**
+- `createDeleteHook` - For soft delete operations
+- `createRestoreHook` - For restore operations  
+- `createCreateHook` - For create operations
+- `createUpdateHook` - For update operations
+
+**Legacy Admin Hook Factories (backward compatible):**
+- `createAdminDeleteHook` - Wraps `createDeleteHook` with admin styling
+- `createAdminRestoreHook` - Wraps `createRestoreHook` with admin styling
+- `createAdminCreateHook` - Wraps `createCreateHook` with admin styling
+- `createAdminUpdateHook` - Wraps `createUpdateHook` with admin styling
+
+**Benefits:**
+- ✅ **Flexible notification styles** - admin (with descriptions), user (simple), or none
+- ✅ **Standardized success/error handling** across all operations
+- ✅ **Query cache management** handled automatically
+- ✅ **Dialog/form state management** simplified to handler functions
+- ✅ **Form reset logic** handled automatically for create operations
+- ✅ **Type safety** maintained with proper TypeScript definitions
+- ✅ **Context flexibility** - same hooks work in admin and user areas
+
+### Legacy TanStack Query Pattern (Avoid - Use Mutation Hook Factories Instead)
+```typescript
+// OLD PATTERN - Avoid this repetitive approach
 export function useCreateExample(options?: MutationOptions) {
   const queryClient = useQueryClient()
   
@@ -106,13 +168,22 @@ export function useCreateExample(options?: MutationOptions) {
     ...options, // Spread options first
     mutationFn: (data) => serverAction(data),
     onSuccess: (result, variables, context) => {
-      // Core hook functionality (cache management) always runs first
+      // Manual cache management (repetitive)
       queryClient.refetchQueries({ queryKey: ["examples"] })
+      
+      // Manual toast notifications (repetitive)
+      if (result.success) {
+        toast.success("Example created successfully")
+      } else {
+        toast.error("Failed to create example")
+      }
       
       // Then call component-specific callback
       options?.onSuccess?.(result, variables, context)
     },
     onError: (error, variables, context) => {
+      // Manual error handling (repetitive)
+      toast.error("Error creating example")
       options?.onError?.(error, variables, context)
     },
   })
@@ -141,6 +212,38 @@ const form = useForm<FormData>({
   defaultValues: { ... }
 })
 
+// PREFERRED: Use standardized mutation hooks
+// Admin forms (with detailed notifications)
+const createMutation = useCreateEntity({
+  formHandlers: {
+    closeSheet: () => onSuccess?.(),
+    resetForm: () => form.reset()
+  },
+  notificationStyle: "admin"
+})
+
+// User forms (with simple notifications)
+const createMutation = useCreateEntity({
+  formHandlers: {
+    resetForm: () => form.reset()
+  },
+  notificationStyle: "user"
+})
+
+// Forms without notifications (custom handling)
+const createMutation = useCreateEntity({
+  notificationStyle: "none",
+  customCallbacks: {
+    onSuccess: (result) => {
+      if (result.success) {
+        // Custom success handling
+        customSuccessAction(result)
+      }
+    }
+  }
+})
+
+// LEGACY: Avoid this repetitive approach
 const mutation = useMutation({
   onSuccess: (result) => {
     if (result.success) {
@@ -168,14 +271,31 @@ const mutation = useMutation({
 
 ### When Implementing New Features
 - **Follow established patterns** documented above for consistency
+- **Use standardized mutation hook factories** for all CRUD operations instead of custom TanStack Query hooks
+- **Choose appropriate notification style** - `"admin"` for admin pages, `"user"` for user-facing pages, `"none"` for custom handling
 - **Use shadcn/ui components** with the Form pattern for all forms
-- **Implement TanStack Query hooks** following the established mutation hook pattern
 - **Create server actions** with consistent return format `{ success: boolean, data?, error? }`
 - **Use Zod schemas** in `src/lib/[domain]/validations.ts` for form validation
 - **Implement soft deletes** with `destroyed_at` field and restore functionality
-- **Use Sonner toast notifications** for user feedback
+- **Let hooks handle notifications** - avoid manual toast calls in components
 - **Maintain TypeScript strict mode** compliance throughout
 - **Store environment variables** in `.env.local` (see template structure)
+
+### Mutation Hook Implementation Guidelines
+1. **Create entity config** with `entityName`, `queryKey`, and `displayNameFn`
+2. **Use hook factories** from `@/utils/mutations`
+3. **Define proper result types** extending `MutationResult`
+4. **Export as constants** (not functions) for consistency
+5. **Import from actions** rather than inline mutation functions
+6. **Choose appropriate notification style** for the context
+
+### Component Guidelines
+1. **Use handler objects** (`dialogHandlers`/`formHandlers`) for state management
+2. **Remove manual toast imports** - handled automatically by hooks
+3. **Specify notification style** based on context (admin/user/none)
+4. **Provide dialog/sheet state management** via handler functions
+5. **Specify form reset logic** for create operations
+6. **Avoid repetitive error handling** - standardized in hooks
 
 ### TypeScript Guidelines
 - **NEVER use `any` type** - Always prefer proper typing, `unknown`, or union types

@@ -30,7 +30,6 @@ import { useGetAllCuisineTypes } from "@/hooks/cuisine-type/use-get-all-cuisine-
 import { useGetDeletedCuisineTypes } from "@/hooks/cuisine-type/use-get-deleted-cuisine-types";
 import { useRestoreCuisineType } from "@/hooks/cuisine-type/use-restore-cuisine-type";
 import { useState } from "react";
-import { toast } from "sonner";
 import { CuisineTypeForm } from "../../../components/cuisine-types/cuisine-type-form";
 import { columns } from "./columns";
 
@@ -54,49 +53,17 @@ export default function AdminCuisineTypePage() {
   } = useGetDeletedCuisineTypes();
 
   const restoreCuisineTypeMutation = useRestoreCuisineType({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Cuisine type restored successfully", {
-          description: `${result.cuisineType?.name} has been restored.`,
-        });
-      } else {
-        toast.error("Failed to restore cuisine type", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setRestoreDialogOpen(false);
-      setRestoringCuisineTypeId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error restoring cuisine type", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setRestoreDialogOpen(false);
-      setRestoringCuisineTypeId(null);
-    },
+    adminHandlers: {
+      closeRestoreDialog: () => setRestoreDialogOpen(false),
+      resetRestoreId: () => setRestoringCuisineTypeId(null)
+    }
   });
 
   const deleteCuisineTypeMutation = useDeleteCuisineType({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Cuisine type deleted successfully", {
-          description: `${result.cuisineType?.name} has been moved to trash.`,
-        });
-      } else {
-        toast.error("Failed to delete cuisine type", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setDeleteDialogOpen(false);
-      setDeletingCuisineTypeId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error deleting cuisine type", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setDeleteDialogOpen(false);
-      setDeletingCuisineTypeId(null);
-    },
+    adminHandlers: {
+      closeDeleteDialog: () => setDeleteDialogOpen(false),
+      resetDeleteId: () => setDeletingCuisineTypeId(null)
+    }
   });
 
   const handleDeleteCuisineType = () => {

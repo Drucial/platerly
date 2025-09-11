@@ -5,7 +5,7 @@ import { getDeletedCuisineTypes } from "@/actions/cuisine-type"
 
 export function useGetDeletedCuisineTypes(options?: { enabled?: boolean }) {
   return useQuery({
-    queryKey: ["deleted-cuisine-types"],
+    queryKey: ["cuisine-types", "deleted"],
     queryFn: getDeletedCuisineTypes,
     enabled: options?.enabled !== false,
     staleTime: 5 * 60 * 1000, // 5 minutes

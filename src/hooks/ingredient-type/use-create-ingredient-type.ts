@@ -1,30 +1,20 @@
 "use client"
 
-import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query"
 import { createIngredientType, type CreateIngredientTypeData } from "@/actions/ingredient-type"
+import { createAdminCreateHook } from "@/utils/mutations/hooks"
+import type { AdminMutationResult } from "@/utils/mutations/mutations"
 
-type CreateIngredientTypeMutationOptions = UseMutationOptions<
-  Awaited<ReturnType<typeof createIngredientType>>,
-  Error,
-  CreateIngredientTypeData
->
-
-export function useCreateIngredientType(options?: CreateIngredientTypeMutationOptions) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    ...options,
-    mutationFn: (data: CreateIngredientTypeData) => createIngredientType(data),
-    onSuccess: (result, variables, context) => {
-      // Always refetch ingredient types list immediately (core hook functionality)
-      queryClient.refetchQueries({ queryKey: ["ingredient-types"] })
-      
-      // Call custom onSuccess if provided (component-specific logic)
-      options?.onSuccess?.(result, variables, context)
-    },
-    onError: (error, variables, context) => {
-      // Call custom onError if provided
-      options?.onError?.(error, variables, context)
-    },
-  })
+type CreateIngredientTypeResult = AdminMutationResult & {
+  type?: { name: string }
 }
+
+const ingredientTypeConfig = {
+  entityName: "Ingredient Type",
+  queryKey: "ingredient-types",
+  displayNameFn: (type: unknown) => (type as { name: string }).name
+}
+
+export const useCreateIngredientType = createAdminCreateHook<CreateIngredientTypeResult, CreateIngredientTypeData>(
+  ingredientTypeConfig,
+  createIngredientType
+)

@@ -30,7 +30,6 @@ import { useGetAllIngredientTypes } from "@/hooks/ingredient-type/use-get-all-in
 import { useGetDeletedIngredientTypes } from "@/hooks/ingredient-type/use-get-deleted-ingredient-types";
 import { useRestoreIngredientType } from "@/hooks/ingredient-type/use-restore-ingredient-type";
 import { useState } from "react";
-import { toast } from "sonner";
 import { IngredientTypeForm } from "../../../components/ingredient-types/ingredient-type-form";
 import { columns } from "./columns";
 
@@ -54,49 +53,17 @@ export default function AdminIngredientTypePage() {
   } = useGetDeletedIngredientTypes();
 
   const restoreIngredientTypeMutation = useRestoreIngredientType({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient type restored successfully", {
-          description: `${result.type?.name} has been restored.`,
-        });
-      } else {
-        toast.error("Failed to restore ingredient type", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setRestoreDialogOpen(false);
-      setRestoringIngredientTypeId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error restoring ingredient type", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setRestoreDialogOpen(false);
-      setRestoringIngredientTypeId(null);
-    },
+    adminHandlers: {
+      closeRestoreDialog: () => setRestoreDialogOpen(false),
+      resetRestoreId: () => setRestoringIngredientTypeId(null)
+    }
   });
 
   const deleteIngredientTypeMutation = useDeleteIngredientType({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient type deleted successfully", {
-          description: `${result.type?.name} has been moved to trash.`,
-        });
-      } else {
-        toast.error("Failed to delete ingredient type", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setDeleteDialogOpen(false);
-      setDeletingIngredientTypeId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error deleting ingredient type", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setDeleteDialogOpen(false);
-      setDeletingIngredientTypeId(null);
-    },
+    adminHandlers: {
+      closeDeleteDialog: () => setDeleteDialogOpen(false),
+      resetDeleteId: () => setDeletingIngredientTypeId(null)
+    }
   });
 
   const handleDeleteIngredientType = () => {

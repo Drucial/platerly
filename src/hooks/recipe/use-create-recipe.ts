@@ -1,30 +1,20 @@
 "use client"
 
-import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query"
 import { createRecipe, type CreateRecipeData } from "@/actions/recipe"
+import { createAdminCreateHook } from "@/utils/mutations/hooks"
+import type { AdminMutationResult } from "@/utils/mutations/mutations"
 
-type CreateRecipeMutationOptions = UseMutationOptions<
-  Awaited<ReturnType<typeof createRecipe>>,
-  Error,
-  CreateRecipeData
->
-
-export function useCreateRecipe(options?: CreateRecipeMutationOptions) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    ...options,
-    mutationFn: (data: CreateRecipeData) => createRecipe(data),
-    onSuccess: (result, variables, context) => {
-      // Always invalidate recipes cache (core hook functionality)
-      queryClient.invalidateQueries({ queryKey: ["recipes"] })
-      
-      // Call custom onSuccess if provided (component-specific logic)
-      options?.onSuccess?.(result, variables, context)
-    },
-    onError: (error, variables, context) => {
-      // Call custom onError if provided
-      options?.onError?.(error, variables, context)
-    },
-  })
+type CreateRecipeResult = AdminMutationResult & {
+  recipe?: { name: string }
 }
+
+const recipeConfig = {
+  entityName: "Recipe",
+  queryKey: "recipes",
+  displayNameFn: (recipe: unknown) => (recipe as { name: string }).name
+}
+
+export const useCreateRecipe = createAdminCreateHook<CreateRecipeResult, CreateRecipeData>(
+  recipeConfig,
+  createRecipe
+)

@@ -4,6 +4,7 @@ import {
   Book,
   CalendarDays,
   ChefHat,
+  LucideProps,
   Shield,
   ShoppingCart,
   Store,
@@ -84,7 +85,16 @@ export default function NavBar() {
   );
 }
 
-const links = [
+type Link = {
+  href: string;
+  label: string;
+  icon: React.ForwardRefExoticComponent<
+    Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+  >;
+  sublinks?: Link[];
+};
+
+const links: Link[] = [
   {
     href: "/",
     label: "Home",

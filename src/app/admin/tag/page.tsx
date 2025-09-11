@@ -30,7 +30,6 @@ import { useGetAllTags } from "@/hooks/tag/use-get-all-tags";
 import { useGetDeletedTags } from "@/hooks/tag/use-get-deleted-tags";
 import { useRestoreTag } from "@/hooks/tag/use-restore-tag";
 import { useState } from "react";
-import { toast } from "sonner";
 import { TagForm } from "../../../components/tags/tag-form";
 import { columns } from "./columns";
 
@@ -50,49 +49,17 @@ export default function AdminTagPage() {
   } = useGetDeletedTags();
 
   const restoreTagMutation = useRestoreTag({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Tag restored successfully", {
-          description: `${result.tag?.name} has been restored.`,
-        });
-      } else {
-        toast.error("Failed to restore tag", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setRestoreDialogOpen(false);
-      setRestoringTagId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error restoring tag", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setRestoreDialogOpen(false);
-      setRestoringTagId(null);
-    },
+    adminHandlers: {
+      closeRestoreDialog: () => setRestoreDialogOpen(false),
+      resetRestoreId: () => setRestoringTagId(null)
+    }
   });
 
   const deleteTagMutation = useDeleteTag({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Tag deleted successfully", {
-          description: `${result.tag?.name} has been moved to trash.`,
-        });
-      } else {
-        toast.error("Failed to delete tag", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setDeleteDialogOpen(false);
-      setDeletingTagId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error deleting tag", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setDeleteDialogOpen(false);
-      setDeletingTagId(null);
-    },
+    adminHandlers: {
+      closeDeleteDialog: () => setDeleteDialogOpen(false),
+      resetDeleteId: () => setDeletingTagId(null)
+    }
   });
 
   const handleDeleteTag = () => {

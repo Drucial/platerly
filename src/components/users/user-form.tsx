@@ -23,7 +23,6 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { RestoreUserDialog } from "./restore-user-dialog";
 
 type UserFormProps = {
@@ -70,47 +69,22 @@ export function UserForm({ mode, userId, onSuccess }: UserFormProps) {
   }, [userData, isEditMode, form]);
 
   const createUserMutation = useCreateUser({
+    adminHandlers: {
+      closeSheet: onSuccess,
+      resetForm: () => form.reset()
+    },
     onSuccess: (result) => {
-      if (result.success) {
-        form.reset();
-        toast.success("User created successfully", {
-          description: `${result.user?.first_name} ${result.user?.last_name} has been added to the system.`,
-        });
-        onSuccess();
-      } else if (result.error === "EXISTING_DELETED_USER") {
-        setExistingUser(result.existingUser || null);
+      if (result.error === "EXISTING_DELETED_USER") {
+        setExistingUser((result.existingUser || null) as User | null);
         setShowRestoreDialog(true);
-      } else {
-        toast.error("Failed to create user", {
-          description: result.error || "An unexpected error occurred.",
-        });
       }
-    },
-    onError: (error: Error) => {
-      toast.error("Error creating user", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
+    }
   });
 
   const updateUserMutation = useUpdateUser({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("User updated successfully", {
-          description: `${result.user?.first_name} ${result.user?.last_name} has been updated.`,
-        });
-        onSuccess();
-      } else {
-        toast.error("Failed to update user", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast.error("Error updating user", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
+    adminHandlers: {
+      closeSheet: onSuccess
+    }
   });
 
   const onSubmit = (data: CreateUserFormData | UpdateUserFormData) => {

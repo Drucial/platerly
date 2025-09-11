@@ -30,7 +30,6 @@ import { useGetAllIngredients } from "@/hooks/ingredient/use-get-all-ingredients
 import { useGetDeletedIngredients } from "@/hooks/ingredient/use-get-deleted-ingredients";
 import { useRestoreIngredient } from "@/hooks/ingredient/use-restore-ingredient";
 import { useState } from "react";
-import { toast } from "sonner";
 import { IngredientForm } from "../../../components/ingredients/ingredient-form";
 import { columns } from "./columns";
 
@@ -54,48 +53,16 @@ export default function AdminIngredientPage() {
   } = useGetDeletedIngredients();
 
   const restoreIngredientMutation = useRestoreIngredient({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient restored successfully", {
-          description: `${result.ingredient?.name} has been restored.`,
-        });
-      } else {
-        toast.error("Failed to restore ingredient", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setRestoreDialogOpen(false);
-      setRestoringIngredientId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error restoring ingredient", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setRestoreDialogOpen(false);
-      setRestoringIngredientId(null);
+    adminHandlers: {
+      closeRestoreDialog: () => setRestoreDialogOpen(false),
+      resetRestoreId: () => setRestoringIngredientId(null),
     },
   });
 
   const deleteIngredientMutation = useDeleteIngredient({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient deleted successfully", {
-          description: `${result.ingredient?.name} has been moved to trash.`,
-        });
-      } else {
-        toast.error("Failed to delete ingredient", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setDeleteDialogOpen(false);
-      setDeletingIngredientId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error deleting ingredient", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setDeleteDialogOpen(false);
-      setDeletingIngredientId(null);
+    adminHandlers: {
+      closeDeleteDialog: () => setDeleteDialogOpen(false),
+      resetDeleteId: () => setDeletingIngredientId(null),
     },
   });
 

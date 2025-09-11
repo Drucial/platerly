@@ -1,30 +1,25 @@
-"use client"
-
-import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query"
+import { createAdminCreateHook } from "@/utils/mutations/hooks"
 import { createTag, type CreateTagData } from "@/actions/tag"
+import type { AdminMutationResult } from "@/utils/mutations/mutations"
 
-type CreateTagMutationOptions = UseMutationOptions<
-  Awaited<ReturnType<typeof createTag>>,
-  Error,
-  CreateTagData
->
-
-export function useCreateTag(options?: CreateTagMutationOptions) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    ...options,
-    mutationFn: (data: CreateTagData) => createTag(data),
-    onSuccess: (result, variables, context) => {
-      // Always refetch tags list immediately (core hook functionality)
-      queryClient.refetchQueries({ queryKey: ["tags"] })
-      
-      // Call custom onSuccess if provided (component-specific logic)
-      options?.onSuccess?.(result, variables, context)
-    },
-    onError: (error, variables, context) => {
-      // Call custom onError if provided
-      options?.onError?.(error, variables, context)
-    },
-  })
+type CreateTagResult = AdminMutationResult & {
+  tag?: {
+    id: number
+    name: string
+    description: string
+    created_at: Date
+    updated_at: Date
+    destroyed_at: Date | null
+  }
 }
+
+const tagConfig = {
+  entityName: "Tag",
+  queryKey: "tags",
+  displayNameFn: (tag: unknown) => (tag as { name: string }).name
+}
+
+export const useCreateTag = createAdminCreateHook<CreateTagResult, CreateTagData>(
+  tagConfig,
+  createTag
+)

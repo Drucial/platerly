@@ -1,32 +1,20 @@
 "use client"
 
-import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query"
 import { restoreIngredientLocation } from "@/actions/ingredient-location"
+import { createAdminRestoreHook } from "@/utils/mutations/hooks"
+import type { AdminMutationResult } from "@/utils/mutations/mutations"
 
-type RestoreIngredientLocationMutationOptions = UseMutationOptions<
-  Awaited<ReturnType<typeof restoreIngredientLocation>>,
-  Error,
-  number
->
-
-export function useRestoreIngredientLocation(options?: RestoreIngredientLocationMutationOptions) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    ...options,
-    mutationFn: (id: number) => restoreIngredientLocation(id),
-    onSuccess: (result, variables, context) => {
-      // Always refetch ingredient locations lists (core hook functionality)
-      queryClient.refetchQueries({ queryKey: ["ingredient-locations"] })
-      queryClient.refetchQueries({ queryKey: ["ingredient-locations", "deleted"] })
-      queryClient.refetchQueries({ queryKey: ["ingredient-locations", variables] })
-      
-      // Call custom onSuccess if provided (component-specific logic)
-      options?.onSuccess?.(result, variables, context)
-    },
-    onError: (error, variables, context) => {
-      // Call custom onError if provided
-      options?.onError?.(error, variables, context)
-    },
-  })
+type RestoreIngredientLocationResult = AdminMutationResult & {
+  location?: { name: string }
 }
+
+const ingredientLocationConfig = {
+  entityName: "Ingredient Location",
+  queryKey: "ingredient-locations",
+  displayNameFn: (location: unknown) => (location as { name: string }).name
+}
+
+export const useRestoreIngredientLocation = createAdminRestoreHook<RestoreIngredientLocationResult>(
+  ingredientLocationConfig,
+  restoreIngredientLocation
+)

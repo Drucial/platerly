@@ -30,7 +30,6 @@ import { useGetAllIngredientLocations } from "@/hooks/ingredient-location/use-ge
 import { useGetDeletedIngredientLocations } from "@/hooks/ingredient-location/use-get-deleted-ingredient-locations";
 import { useRestoreIngredientLocation } from "@/hooks/ingredient-location/use-restore-ingredient-location";
 import { useState } from "react";
-import { toast } from "sonner";
 import { IngredientLocationForm } from "../../../components/ingredient-locations/ingredient-location-form";
 import { columns } from "./columns";
 
@@ -52,49 +51,17 @@ export default function AdminIngredientLocationPage() {
   } = useGetDeletedIngredientLocations();
 
   const restoreIngredientLocationMutation = useRestoreIngredientLocation({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient location restored successfully", {
-          description: `${result.location?.name} has been restored.`,
-        });
-      } else {
-        toast.error("Failed to restore ingredient location", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setRestoreDialogOpen(false);
-      setRestoringIngredientLocationId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error restoring ingredient location", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setRestoreDialogOpen(false);
-      setRestoringIngredientLocationId(null);
-    },
+    adminHandlers: {
+      closeRestoreDialog: () => setRestoreDialogOpen(false),
+      resetRestoreId: () => setRestoringIngredientLocationId(null)
+    }
   });
 
   const deleteIngredientLocationMutation = useDeleteIngredientLocation({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient location deleted successfully", {
-          description: `${result.location?.name} has been moved to trash.`,
-        });
-      } else {
-        toast.error("Failed to delete ingredient location", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setDeleteDialogOpen(false);
-      setDeletingIngredientLocationId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error deleting ingredient location", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setDeleteDialogOpen(false);
-      setDeletingIngredientLocationId(null);
-    },
+    adminHandlers: {
+      closeDeleteDialog: () => setDeleteDialogOpen(false),
+      resetDeleteId: () => setDeletingIngredientLocationId(null)
+    }
   });
 
   const handleDeleteIngredientLocation = () => {

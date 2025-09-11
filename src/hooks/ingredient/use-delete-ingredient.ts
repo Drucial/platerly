@@ -1,31 +1,20 @@
 "use client"
 
-import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query"
 import { deleteIngredient } from "@/actions/ingredient"
+import { createAdminDeleteHook } from "@/utils/mutations/hooks"
+import type { AdminMutationResult } from "@/utils/mutations/mutations"
 
-type DeleteIngredientMutationOptions = UseMutationOptions<
-  Awaited<ReturnType<typeof deleteIngredient>>,
-  Error,
-  number
->
-
-export function useDeleteIngredient(options?: DeleteIngredientMutationOptions) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    ...options,
-    mutationFn: (id: number) => deleteIngredient(id),
-    onSuccess: (result, variables, context) => {
-      // Always refetch ingredients list (core hook functionality)
-      queryClient.refetchQueries({ queryKey: ["ingredients"] })
-      queryClient.refetchQueries({ queryKey: ["ingredients", variables] })
-      
-      // Call custom onSuccess if provided (component-specific logic)
-      options?.onSuccess?.(result, variables, context)
-    },
-    onError: (error, variables, context) => {
-      // Call custom onError if provided
-      options?.onError?.(error, variables, context)
-    },
-  })
+type DeleteIngredientResult = AdminMutationResult & {
+  ingredient?: { name: string }
 }
+
+const ingredientConfig = {
+  entityName: "Ingredient",
+  queryKey: "ingredients",
+  displayNameFn: (ingredient: unknown) => (ingredient as { name: string }).name
+}
+
+export const useDeleteIngredient = createAdminDeleteHook<DeleteIngredientResult>(
+  ingredientConfig,
+  deleteIngredient
+)

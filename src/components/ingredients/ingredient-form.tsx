@@ -1,8 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,7 +10,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -21,14 +17,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useGetAllImages } from "@/hooks/image/use-get-all-images";
+import { useGetAllIngredientLocations } from "@/hooks/ingredient-location/use-get-all-ingredient-locations";
+import { useGetAllIngredientTypes } from "@/hooks/ingredient-type/use-get-all-ingredient-types";
 import { useCreateIngredient } from "@/hooks/ingredient/use-create-ingredient";
 import { useGetIngredient } from "@/hooks/ingredient/use-get-ingredient";
 import { useUpdateIngredient } from "@/hooks/ingredient/use-update-ingredient";
-import { useGetAllImages } from "@/hooks/image/use-get-all-images";
-import { useGetAllIngredientTypes } from "@/hooks/ingredient-type/use-get-all-ingredient-types";
-import { useGetAllIngredientLocations } from "@/hooks/ingredient-location/use-get-all-ingredient-locations";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const ingredientFormSchema = z.object({
   name: z
@@ -52,7 +51,11 @@ type IngredientFormProps = {
   onSuccess?: () => void;
 };
 
-export function IngredientForm({ mode, ingredientId, onSuccess }: IngredientFormProps) {
+export function IngredientForm({
+  mode,
+  ingredientId,
+  onSuccess,
+}: IngredientFormProps) {
   const form = useForm<IngredientFormData>({
     resolver: zodResolver(ingredientFormSchema),
     defaultValues: {
@@ -73,43 +76,15 @@ export function IngredientForm({ mode, ingredientId, onSuccess }: IngredientForm
   const { data: locationsData } = useGetAllIngredientLocations();
 
   const createIngredientMutation = useCreateIngredient({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient created successfully", {
-          description: `${result.ingredient?.name} has been created.`,
-        });
-        form.reset();
-        onSuccess?.();
-      } else {
-        toast.error("Failed to create ingredient", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast.error("Error creating ingredient", {
-        description: error.message || "An unexpected error occurred.",
-      });
+    adminHandlers: {
+      closeSheet: () => onSuccess?.(),
+      resetForm: () => form.reset(),
     },
   });
 
   const updateIngredientMutation = useUpdateIngredient({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient updated successfully", {
-          description: `${result.ingredient?.name} has been updated.`,
-        });
-        onSuccess?.();
-      } else {
-        toast.error("Failed to update ingredient", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast.error("Error updating ingredient", {
-        description: error.message || "An unexpected error occurred.",
-      });
+    adminHandlers: {
+      closeSheet: () => onSuccess?.(),
     },
   });
 
@@ -142,7 +117,8 @@ export function IngredientForm({ mode, ingredientId, onSuccess }: IngredientForm
     }
   };
 
-  const isPending = createIngredientMutation.isPending || updateIngredientMutation.isPending;
+  const isPending =
+    createIngredientMutation.isPending || updateIngredientMutation.isPending;
 
   return (
     <Form {...form}>
@@ -219,9 +195,13 @@ export function IngredientForm({ mode, ingredientId, onSuccess }: IngredientForm
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {locationsData?.locations && locationsData.locations.length > 0 ? (
+                  {locationsData?.locations &&
+                  locationsData.locations.length > 0 ? (
                     locationsData.locations.map((location) => (
-                      <SelectItem key={location.id} value={location.id.toString()}>
+                      <SelectItem
+                        key={location.id}
+                        value={location.id.toString()}
+                      >
                         {location.name}
                       </SelectItem>
                     ))
@@ -272,8 +252,8 @@ export function IngredientForm({ mode, ingredientId, onSuccess }: IngredientForm
               ? "Creating..."
               : "Updating..."
             : mode === "create"
-              ? "Create Ingredient"
-              : "Update Ingredient"}
+            ? "Create Ingredient"
+            : "Update Ingredient"}
         </Button>
       </form>
     </Form>

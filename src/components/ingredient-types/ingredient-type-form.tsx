@@ -17,7 +17,6 @@ import { useCreateIngredientType } from "@/hooks/ingredient-type/use-create-ingr
 import { useGetIngredientType } from "@/hooks/ingredient-type/use-get-ingredient-type";
 import { useUpdateIngredientType } from "@/hooks/ingredient-type/use-update-ingredient-type";
 import { useEffect } from "react";
-import { toast } from "sonner";
 
 const ingredientTypeFormSchema = z.object({
   name: z
@@ -47,44 +46,16 @@ export function IngredientTypeForm({ mode, ingredientTypeId, onSuccess }: Ingred
   });
 
   const createIngredientTypeMutation = useCreateIngredientType({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient type created successfully", {
-          description: `${result.type?.name} has been created.`,
-        });
-        form.reset();
-        onSuccess?.();
-      } else {
-        toast.error("Failed to create ingredient type", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast.error("Error creating ingredient type", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
+    adminHandlers: {
+      closeSheet: () => onSuccess?.(),
+      resetForm: () => form.reset()
+    }
   });
 
   const updateIngredientTypeMutation = useUpdateIngredientType({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Ingredient type updated successfully", {
-          description: `${result.type?.name} has been updated.`,
-        });
-        onSuccess?.();
-      } else {
-        toast.error("Failed to update ingredient type", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast.error("Error updating ingredient type", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
+    adminHandlers: {
+      closeSheet: () => onSuccess?.()
+    }
   });
 
   useEffect(() => {

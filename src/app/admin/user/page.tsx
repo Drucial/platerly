@@ -30,7 +30,6 @@ import { useGetAllUsers } from "@/hooks/user/use-get-all-users";
 import { useGetDeletedUsers } from "@/hooks/user/use-get-deleted-users";
 import { useRestoreUser } from "@/hooks/user/use-restore-user";
 import { useState } from "react";
-import { toast } from "sonner";
 import { UserForm } from "../../../components/users/user-form";
 import { columns } from "./columns";
 
@@ -50,49 +49,17 @@ export default function AdminUserPage() {
   } = useGetDeletedUsers();
 
   const restoreUserMutation = useRestoreUser({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("User restored successfully", {
-          description: `${result.user?.first_name} ${result.user?.last_name} has been restored.`,
-        });
-      } else {
-        toast.error("Failed to restore user", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setRestoreDialogOpen(false);
-      setRestoringUserId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error restoring user", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setRestoreDialogOpen(false);
-      setRestoringUserId(null);
-    },
+    adminHandlers: {
+      closeRestoreDialog: () => setRestoreDialogOpen(false),
+      resetRestoreId: () => setRestoringUserId(null)
+    }
   });
 
   const deleteUserMutation = useDeleteUser({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("User deleted successfully", {
-          description: `${result.user?.first_name} ${result.user?.last_name} has been moved to trash.`,
-        });
-      } else {
-        toast.error("Failed to delete user", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-      setDeleteDialogOpen(false);
-      setDeletingUserId(null);
-    },
-    onError: (error: Error) => {
-      toast.error("Error deleting user", {
-        description: error.message || "An unexpected error occurred.",
-      });
-      setDeleteDialogOpen(false);
-      setDeletingUserId(null);
-    },
+    adminHandlers: {
+      closeDeleteDialog: () => setDeleteDialogOpen(false),
+      resetDeleteId: () => setDeletingUserId(null)
+    }
   });
 
   const handleDeleteUser = () => {

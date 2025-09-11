@@ -91,11 +91,50 @@ src/
 │   └── ui/        # shadcn/ui components
 ├── hooks/         # Custom React hooks with TanStack Query
 ├── lib/           # Utilities and configurations
-└── types/         # TypeScript type definitions
+├── types/         # TypeScript type definitions
+└── utils/         # Utility functions
+    └── mutations/ # Standardized mutation hook factories
 
 prisma/            # Database schema and migrations
 docs/              # Project documentation
 ```
+
+## Development Patterns
+
+### Standardized Mutation Hooks
+This project uses standardized mutation hook factories that handle:
+- ✅ **Automatic notifications** - configurable for admin/user/none contexts
+- ✅ **Query cache management** - automatic invalidation and refetching
+- ✅ **Error handling** - consistent error messaging across the app
+- ✅ **Form/dialog state** - simplified handlers for UI state management
+
+```typescript
+// Example: Create a user hook
+const userConfig = {
+  entityName: "User",
+  queryKey: "users",
+  displayNameFn: (user) => `${user.first_name} ${user.last_name}`
+}
+
+export const useCreateUser = createCreateHook(userConfig, createUserAction)
+
+// Usage in admin pages (detailed notifications)
+const mutation = useCreateUser({
+  formHandlers: { closeSheet, resetForm },
+  notificationStyle: "admin"
+})
+
+// Usage in user pages (simple notifications)
+const mutation = useCreateUser({ notificationStyle: "user" })
+```
+
+## Key Features
+
+- **Standardized CRUD Operations**: Mutation hook factories eliminate boilerplate
+- **Flexible Notifications**: Admin (detailed), user (simple), or none 
+- **Type-Safe**: Full TypeScript support with proper type inference
+- **Cache Management**: Automatic query invalidation and optimistic updates
+- **Form Integration**: Seamless integration with React Hook Form + Zod
 
 ## Contributing
 

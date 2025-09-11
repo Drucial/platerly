@@ -5,7 +5,7 @@ import { getDeletedTags } from "@/actions/tag"
 
 export function useGetDeletedTags(options?: { enabled?: boolean }) {
   return useQuery({
-    queryKey: ["deleted-tags"],
+    queryKey: ["tags", "deleted"],
     queryFn: getDeletedTags,
     enabled: options?.enabled !== false,
     staleTime: 5 * 60 * 1000, // 5 minutes

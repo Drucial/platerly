@@ -14,11 +14,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useCreateCuisineType } from "@/hooks/cuisine-type/use-create-cuisine-type";
+import { useCreateCuisineTypeAdmin } from "@/hooks/cuisine-type/use-create-cuisine-type";
 import { useGetCuisineType } from "@/hooks/cuisine-type/use-get-cuisine-type";
 import { useUpdateCuisineType } from "@/hooks/cuisine-type/use-update-cuisine-type";
 import { useEffect } from "react";
-import { toast } from "sonner";
 
 const cuisineTypeFormSchema = z.object({
   name: z
@@ -52,45 +51,17 @@ export function CuisineTypeForm({ mode, cuisineTypeId, onSuccess }: CuisineTypeF
     enabled: mode === "edit" && !!cuisineTypeId,
   });
 
-  const createCuisineTypeMutation = useCreateCuisineType({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Cuisine type created successfully", {
-          description: `${result.cuisineType?.name} has been created.`,
-        });
-        form.reset();
-        onSuccess?.();
-      } else {
-        toast.error("Failed to create cuisine type", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast.error("Error creating cuisine type", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
+  const createCuisineTypeMutation = useCreateCuisineTypeAdmin({
+    adminHandlers: {
+      closeSheet: () => onSuccess?.(),
+      resetForm: () => form.reset()
+    }
   });
 
   const updateCuisineTypeMutation = useUpdateCuisineType({
-    onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Cuisine type updated successfully", {
-          description: `${result.cuisineType?.name} has been updated.`,
-        });
-        onSuccess?.();
-      } else {
-        toast.error("Failed to update cuisine type", {
-          description: result.error || "An unexpected error occurred.",
-        });
-      }
-    },
-    onError: (error: Error) => {
-      toast.error("Error updating cuisine type", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
+    adminHandlers: {
+      closeSheet: () => onSuccess?.()
+    }
   });
 
   useEffect(() => {
