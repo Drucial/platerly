@@ -13,7 +13,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FullScreenError } from "@/components/ui/full-screen-error";
 import { FullScreenLoader } from "@/components/ui/full-screen-loader";
 import {
@@ -25,6 +24,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDeleteIngredientLocation } from "@/hooks/ingredient-location/use-delete-ingredient-location";
 import { useGetAllIngredientLocations } from "@/hooks/ingredient-location/use-get-all-ingredient-locations";
 import { useGetDeletedIngredientLocations } from "@/hooks/ingredient-location/use-get-deleted-ingredient-locations";
@@ -38,11 +38,18 @@ export default function AdminIngredientLocationPage() {
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingIngredientLocationId, setDeletingIngredientLocationId] = useState<number | null>(null);
+  const [deletingIngredientLocationId, setDeletingIngredientLocationId] =
+    useState<number | null>(null);
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
-  const [restoringIngredientLocationId, setRestoringIngredientLocationId] = useState<number | null>(null);
+  const [restoringIngredientLocationId, setRestoringIngredientLocationId] =
+    useState<number | null>(null);
   const { data, error, isLoading, refetch } = useGetAllIngredientLocations();
-  const { data: deletedData, error: deletedError, isLoading: deletedLoading, refetch: refetchDeleted } = useGetDeletedIngredientLocations();
+  const {
+    data: deletedData,
+    error: deletedError,
+    isLoading: deletedLoading,
+    refetch: refetchDeleted,
+  } = useGetDeletedIngredientLocations();
 
   const restoreIngredientLocationMutation = useRestoreIngredientLocation({
     onSuccess: (result) => {
@@ -122,7 +129,7 @@ export default function AdminIngredientLocationPage() {
   }
 
   return (
-    <div className="container mx-auto py-10 space-y-6 h-[calc(100svh-var(--navbar-height))] mt-[var(--navbar-height)] flex flex-col">
+    <div className="h-full flex flex-col flex-1 gap-6">
       <AdminHeader
         title="Ingredient Locations"
         description="Manage ingredient locations in the system"
@@ -131,7 +138,7 @@ export default function AdminIngredientLocationPage() {
           setOpen(true);
         }}
       />
-      <Tabs defaultValue="active" className="flex-1 flex flex-col">
+      <Tabs defaultValue="active" className="h-full overflow-hidden">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="active">Active Locations</TabsTrigger>
           <TabsTrigger value="deleted">Deleted Locations</TabsTrigger>
@@ -160,7 +167,9 @@ export default function AdminIngredientLocationPage() {
           ) : deletedError || !deletedData ? (
             <FullScreenError
               title="Error getting deleted ingredient locations"
-              description={deletedError?.message || "An unexpected error occurred."}
+              description={
+                deletedError?.message || "An unexpected error occurred."
+              }
               action={<Button onClick={() => refetchDeleted()}>Retry</Button>}
             />
           ) : (
@@ -180,7 +189,11 @@ export default function AdminIngredientLocationPage() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>{editingId ? "Edit Ingredient Location" : "Create Ingredient Location"}</SheetTitle>
+            <SheetTitle>
+              {editingId
+                ? "Edit Ingredient Location"
+                : "Create Ingredient Location"}
+            </SheetTitle>
             <SheetDescription>
               {editingId
                 ? "Update the ingredient location information below."
@@ -210,8 +223,9 @@ export default function AdminIngredientLocationPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Ingredient Location</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this ingredient location? This action will move
-              the ingredient location to trash and can be undone later.
+              Are you sure you want to delete this ingredient location? This
+              action will move the ingredient location to trash and can be
+              undone later.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -220,7 +234,9 @@ export default function AdminIngredientLocationPage() {
               onClick={handleDeleteIngredientLocation}
               disabled={deleteIngredientLocationMutation.isPending}
             >
-              {deleteIngredientLocationMutation.isPending ? "Deleting..." : "Delete"}
+              {deleteIngredientLocationMutation.isPending
+                ? "Deleting..."
+                : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -231,8 +247,9 @@ export default function AdminIngredientLocationPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Restore Ingredient Location</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to restore this ingredient location? This action will move
-              the ingredient location back to the active locations list.
+              Are you sure you want to restore this ingredient location? This
+              action will move the ingredient location back to the active
+              locations list.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -241,7 +258,9 @@ export default function AdminIngredientLocationPage() {
               onClick={handleRestoreIngredientLocation}
               disabled={restoreIngredientLocationMutation.isPending}
             >
-              {restoreIngredientLocationMutation.isPending ? "Restoring..." : "Restore"}
+              {restoreIngredientLocationMutation.isPending
+                ? "Restoring..."
+                : "Restore"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

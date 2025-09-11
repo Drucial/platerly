@@ -13,7 +13,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FullScreenError } from "@/components/ui/full-screen-error";
 import { FullScreenLoader } from "@/components/ui/full-screen-loader";
 import {
@@ -25,6 +24,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDeleteIngredient } from "@/hooks/ingredient/use-delete-ingredient";
 import { useGetAllIngredients } from "@/hooks/ingredient/use-get-all-ingredients";
 import { useGetDeletedIngredients } from "@/hooks/ingredient/use-get-deleted-ingredients";
@@ -38,11 +38,20 @@ export default function AdminIngredientPage() {
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingIngredientId, setDeletingIngredientId] = useState<number | null>(null);
+  const [deletingIngredientId, setDeletingIngredientId] = useState<
+    number | null
+  >(null);
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
-  const [restoringIngredientId, setRestoringIngredientId] = useState<number | null>(null);
+  const [restoringIngredientId, setRestoringIngredientId] = useState<
+    number | null
+  >(null);
   const { data, error, isLoading, refetch } = useGetAllIngredients();
-  const { data: deletedData, error: deletedError, isLoading: deletedLoading, refetch: refetchDeleted } = useGetDeletedIngredients();
+  const {
+    data: deletedData,
+    error: deletedError,
+    isLoading: deletedLoading,
+    refetch: refetchDeleted,
+  } = useGetDeletedIngredients();
 
   const restoreIngredientMutation = useRestoreIngredient({
     onSuccess: (result) => {
@@ -122,7 +131,7 @@ export default function AdminIngredientPage() {
   }
 
   return (
-    <div className="container mx-auto py-10 space-y-6 h-[calc(100svh-var(--navbar-height))] mt-[var(--navbar-height)] flex flex-col">
+    <div className="h-full flex flex-col flex-1 gap-6">
       <AdminHeader
         title="Ingredients"
         description="Manage ingredients in the system"
@@ -131,12 +140,12 @@ export default function AdminIngredientPage() {
           setOpen(true);
         }}
       />
-      <Tabs defaultValue="active" className="flex-1 flex flex-col">
+      <Tabs defaultValue="active" className="h-full overflow-hidden">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="active">Active Ingredients</TabsTrigger>
           <TabsTrigger value="deleted">Deleted Ingredients</TabsTrigger>
         </TabsList>
-        <TabsContent value="active" className="flex-1 flex flex-col">
+        <TabsContent value="active" className="h-full overflow-hidden">
           <DataTable
             columns={columns}
             data={data.ingredients || []}
@@ -160,7 +169,9 @@ export default function AdminIngredientPage() {
           ) : deletedError || !deletedData ? (
             <FullScreenError
               title="Error getting deleted ingredients"
-              description={deletedError?.message || "An unexpected error occurred."}
+              description={
+                deletedError?.message || "An unexpected error occurred."
+              }
               action={<Button onClick={() => refetchDeleted()}>Retry</Button>}
             />
           ) : (
@@ -180,7 +191,9 @@ export default function AdminIngredientPage() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>{editingId ? "Edit Ingredient" : "Create Ingredient"}</SheetTitle>
+            <SheetTitle>
+              {editingId ? "Edit Ingredient" : "Create Ingredient"}
+            </SheetTitle>
             <SheetDescription>
               {editingId
                 ? "Update the ingredient information below."
@@ -210,8 +223,8 @@ export default function AdminIngredientPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Ingredient</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this ingredient? This action will move
-              the ingredient to trash and can be undone later.
+              Are you sure you want to delete this ingredient? This action will
+              move the ingredient to trash and can be undone later.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -231,8 +244,8 @@ export default function AdminIngredientPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Restore Ingredient</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to restore this ingredient? This action will move
-              the ingredient back to the active ingredients list.
+              Are you sure you want to restore this ingredient? This action will
+              move the ingredient back to the active ingredients list.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

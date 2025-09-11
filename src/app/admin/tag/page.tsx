@@ -13,7 +13,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FullScreenError } from "@/components/ui/full-screen-error";
 import { FullScreenLoader } from "@/components/ui/full-screen-loader";
 import {
@@ -25,6 +24,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDeleteTag } from "@/hooks/tag/use-delete-tag";
 import { useGetAllTags } from "@/hooks/tag/use-get-all-tags";
 import { useGetDeletedTags } from "@/hooks/tag/use-get-deleted-tags";
@@ -42,7 +42,12 @@ export default function AdminTagPage() {
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [restoringTagId, setRestoringTagId] = useState<number | null>(null);
   const { data, error, isLoading, refetch } = useGetAllTags();
-  const { data: deletedData, error: deletedError, isLoading: deletedLoading, refetch: refetchDeleted } = useGetDeletedTags();
+  const {
+    data: deletedData,
+    error: deletedError,
+    isLoading: deletedLoading,
+    refetch: refetchDeleted,
+  } = useGetDeletedTags();
 
   const restoreTagMutation = useRestoreTag({
     onSuccess: (result) => {
@@ -122,7 +127,7 @@ export default function AdminTagPage() {
   }
 
   return (
-    <div className="container mx-auto py-10 space-y-6 h-[calc(100svh-var(--navbar-height))] mt-[var(--navbar-height)] flex flex-col">
+    <div className="h-full flex flex-col flex-1 gap-6">
       <AdminHeader
         title="Tags"
         description="Manage tags in the system"
@@ -131,12 +136,12 @@ export default function AdminTagPage() {
           setOpen(true);
         }}
       />
-      <Tabs defaultValue="active" className="flex-1 flex flex-col">
+      <Tabs defaultValue="active" className="h-full overflow-hidden">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="active">Active Tags</TabsTrigger>
           <TabsTrigger value="deleted">Deleted Tags</TabsTrigger>
         </TabsList>
-        <TabsContent value="active" className="flex-1 flex flex-col">
+        <TabsContent value="active" className="h-full overflow-hidden">
           <DataTable
             columns={columns}
             data={data.tags || []}
@@ -160,7 +165,9 @@ export default function AdminTagPage() {
           ) : deletedError || !deletedData ? (
             <FullScreenError
               title="Error getting deleted tags"
-              description={deletedError?.message || "An unexpected error occurred."}
+              description={
+                deletedError?.message || "An unexpected error occurred."
+              }
               action={<Button onClick={() => refetchDeleted()}>Retry</Button>}
             />
           ) : (

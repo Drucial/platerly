@@ -120,7 +120,7 @@ export default function AdminRecipePage() {
   }
 
   return (
-    <div className="container mx-auto py-10 space-y-6 h-[calc(100svh-var(--navbar-height))] mt-[var(--navbar-height)] flex flex-col">
+    <div className="h-full flex flex-col flex-1 gap-6">
       <AdminHeader
         title="Recipes"
         description="Manage recipes in the system"
@@ -129,12 +129,12 @@ export default function AdminRecipePage() {
           setOpen(true);
         }}
       />
-      <Tabs defaultValue="active" className="flex-1 flex flex-col">
+      <Tabs defaultValue="active" className="h-full overflow-hidden">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="active">Active Recipes</TabsTrigger>
           <TabsTrigger value="deleted">Deleted Recipes</TabsTrigger>
         </TabsList>
-        <TabsContent value="active" className="flex-1 flex flex-col">
+        <TabsContent value="active" className="h-full overflow-hidden">
           <DataTable
             columns={columns}
             data={data.recipes || []}

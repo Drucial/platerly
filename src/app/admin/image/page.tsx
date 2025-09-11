@@ -13,7 +13,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FullScreenError } from "@/components/ui/full-screen-error";
 import { FullScreenLoader } from "@/components/ui/full-screen-loader";
 import {
@@ -25,6 +24,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDeleteImage } from "@/hooks/image/use-delete-image";
 import { useGetAllImages } from "@/hooks/image/use-get-all-images";
 import { useGetDeletedImages } from "@/hooks/image/use-get-deleted-images";
@@ -42,7 +42,12 @@ export default function AdminImagePage() {
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [restoringImageId, setRestoringImageId] = useState<number | null>(null);
   const { data, error, isLoading, refetch } = useGetAllImages();
-  const { data: deletedData, error: deletedError, isLoading: deletedLoading, refetch: refetchDeleted } = useGetDeletedImages();
+  const {
+    data: deletedData,
+    error: deletedError,
+    isLoading: deletedLoading,
+    refetch: refetchDeleted,
+  } = useGetDeletedImages();
 
   const restoreImageMutation = useRestoreImage({
     onSuccess: (result) => {
@@ -122,7 +127,7 @@ export default function AdminImagePage() {
   }
 
   return (
-    <div className="container mx-auto py-10 space-y-6 h-[calc(100svh-var(--navbar-height))] mt-[var(--navbar-height)] flex flex-col">
+    <div className="h-full flex flex-col flex-1 gap-6">
       <AdminHeader
         title="Images"
         description="Manage images in the system"
@@ -131,12 +136,12 @@ export default function AdminImagePage() {
           setOpen(true);
         }}
       />
-      <Tabs defaultValue="active" className="flex-1 flex flex-col">
+      <Tabs defaultValue="active" className="h-full overflow-hidden">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="active">Active Images</TabsTrigger>
           <TabsTrigger value="deleted">Deleted Images</TabsTrigger>
         </TabsList>
-        <TabsContent value="active" className="flex-1 flex flex-col">
+        <TabsContent value="active" className="h-full overflow-hidden">
           <DataTable
             columns={columns}
             data={data.images || []}
@@ -160,7 +165,9 @@ export default function AdminImagePage() {
           ) : deletedError || !deletedData ? (
             <FullScreenError
               title="Error getting deleted images"
-              description={deletedError?.message || "An unexpected error occurred."}
+              description={
+                deletedError?.message || "An unexpected error occurred."
+              }
               action={<Button onClick={() => refetchDeleted()}>Retry</Button>}
             />
           ) : (

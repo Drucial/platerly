@@ -13,7 +13,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FullScreenError } from "@/components/ui/full-screen-error";
 import { FullScreenLoader } from "@/components/ui/full-screen-loader";
 import {
@@ -25,6 +24,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDeleteCuisineType } from "@/hooks/cuisine-type/use-delete-cuisine-type";
 import { useGetAllCuisineTypes } from "@/hooks/cuisine-type/use-get-all-cuisine-types";
 import { useGetDeletedCuisineTypes } from "@/hooks/cuisine-type/use-get-deleted-cuisine-types";
@@ -38,11 +38,20 @@ export default function AdminCuisineTypePage() {
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingCuisineTypeId, setDeletingCuisineTypeId] = useState<number | null>(null);
+  const [deletingCuisineTypeId, setDeletingCuisineTypeId] = useState<
+    number | null
+  >(null);
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
-  const [restoringCuisineTypeId, setRestoringCuisineTypeId] = useState<number | null>(null);
+  const [restoringCuisineTypeId, setRestoringCuisineTypeId] = useState<
+    number | null
+  >(null);
   const { data, error, isLoading, refetch } = useGetAllCuisineTypes();
-  const { data: deletedData, error: deletedError, isLoading: deletedLoading, refetch: refetchDeleted } = useGetDeletedCuisineTypes();
+  const {
+    data: deletedData,
+    error: deletedError,
+    isLoading: deletedLoading,
+    refetch: refetchDeleted,
+  } = useGetDeletedCuisineTypes();
 
   const restoreCuisineTypeMutation = useRestoreCuisineType({
     onSuccess: (result) => {
@@ -122,7 +131,7 @@ export default function AdminCuisineTypePage() {
   }
 
   return (
-    <div className="container mx-auto py-10 space-y-6 h-[calc(100svh-var(--navbar-height))] mt-[var(--navbar-height)] flex flex-col">
+    <div className="h-full flex flex-col flex-1 gap-6">
       <AdminHeader
         title="Cuisine Types"
         description="Manage cuisine types in the system"
@@ -131,7 +140,7 @@ export default function AdminCuisineTypePage() {
           setOpen(true);
         }}
       />
-      <Tabs defaultValue="active" className="flex-1 flex flex-col">
+      <Tabs defaultValue="active" className="h-full overflow-hidden">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="active">Active Cuisine Types</TabsTrigger>
           <TabsTrigger value="deleted">Deleted Cuisine Types</TabsTrigger>
@@ -160,7 +169,9 @@ export default function AdminCuisineTypePage() {
           ) : deletedError || !deletedData ? (
             <FullScreenError
               title="Error getting deleted cuisine types"
-              description={deletedError?.message || "An unexpected error occurred."}
+              description={
+                deletedError?.message || "An unexpected error occurred."
+              }
               action={<Button onClick={() => refetchDeleted()}>Retry</Button>}
             />
           ) : (
@@ -180,7 +191,9 @@ export default function AdminCuisineTypePage() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>{editingId ? "Edit Cuisine Type" : "Create Cuisine Type"}</SheetTitle>
+            <SheetTitle>
+              {editingId ? "Edit Cuisine Type" : "Create Cuisine Type"}
+            </SheetTitle>
             <SheetDescription>
               {editingId
                 ? "Update the cuisine type information below."
@@ -210,8 +223,8 @@ export default function AdminCuisineTypePage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Cuisine Type</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this cuisine type? This action will move
-              the cuisine type to trash and can be undone later.
+              Are you sure you want to delete this cuisine type? This action
+              will move the cuisine type to trash and can be undone later.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -231,8 +244,8 @@ export default function AdminCuisineTypePage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Restore Cuisine Type</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to restore this cuisine type? This action will move
-              the cuisine type back to the active cuisine types list.
+              Are you sure you want to restore this cuisine type? This action
+              will move the cuisine type back to the active cuisine types list.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -241,7 +254,9 @@ export default function AdminCuisineTypePage() {
               onClick={handleRestoreCuisineType}
               disabled={restoreCuisineTypeMutation.isPending}
             >
-              {restoreCuisineTypeMutation.isPending ? "Restoring..." : "Restore"}
+              {restoreCuisineTypeMutation.isPending
+                ? "Restoring..."
+                : "Restore"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

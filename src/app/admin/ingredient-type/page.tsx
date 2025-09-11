@@ -13,7 +13,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FullScreenError } from "@/components/ui/full-screen-error";
 import { FullScreenLoader } from "@/components/ui/full-screen-loader";
 import {
@@ -25,6 +24,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDeleteIngredientType } from "@/hooks/ingredient-type/use-delete-ingredient-type";
 import { useGetAllIngredientTypes } from "@/hooks/ingredient-type/use-get-all-ingredient-types";
 import { useGetDeletedIngredientTypes } from "@/hooks/ingredient-type/use-get-deleted-ingredient-types";
@@ -38,11 +38,20 @@ export default function AdminIngredientTypePage() {
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletingIngredientTypeId, setDeletingIngredientTypeId] = useState<number | null>(null);
+  const [deletingIngredientTypeId, setDeletingIngredientTypeId] = useState<
+    number | null
+  >(null);
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
-  const [restoringIngredientTypeId, setRestoringIngredientTypeId] = useState<number | null>(null);
+  const [restoringIngredientTypeId, setRestoringIngredientTypeId] = useState<
+    number | null
+  >(null);
   const { data, error, isLoading, refetch } = useGetAllIngredientTypes();
-  const { data: deletedData, error: deletedError, isLoading: deletedLoading, refetch: refetchDeleted } = useGetDeletedIngredientTypes();
+  const {
+    data: deletedData,
+    error: deletedError,
+    isLoading: deletedLoading,
+    refetch: refetchDeleted,
+  } = useGetDeletedIngredientTypes();
 
   const restoreIngredientTypeMutation = useRestoreIngredientType({
     onSuccess: (result) => {
@@ -122,7 +131,7 @@ export default function AdminIngredientTypePage() {
   }
 
   return (
-    <div className="container mx-auto py-10 space-y-6 h-[calc(100svh-var(--navbar-height))] mt-[var(--navbar-height)] flex flex-col">
+    <div className="h-full flex flex-col flex-1 gap-6">
       <AdminHeader
         title="Ingredient Types"
         description="Manage ingredient types in the system"
@@ -131,12 +140,12 @@ export default function AdminIngredientTypePage() {
           setOpen(true);
         }}
       />
-      <Tabs defaultValue="active" className="flex-1 flex flex-col">
+      <Tabs defaultValue="active" className="h-full overflow-hidden">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="active">Active Types</TabsTrigger>
           <TabsTrigger value="deleted">Deleted Types</TabsTrigger>
         </TabsList>
-        <TabsContent value="active" className="flex-1 flex flex-col">
+        <TabsContent value="active" className="h-full overflow-hidden">
           <DataTable
             columns={columns}
             data={data.types || []}
@@ -160,7 +169,9 @@ export default function AdminIngredientTypePage() {
           ) : deletedError || !deletedData ? (
             <FullScreenError
               title="Error getting deleted ingredient types"
-              description={deletedError?.message || "An unexpected error occurred."}
+              description={
+                deletedError?.message || "An unexpected error occurred."
+              }
               action={<Button onClick={() => refetchDeleted()}>Retry</Button>}
             />
           ) : (
@@ -180,7 +191,9 @@ export default function AdminIngredientTypePage() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>{editingId ? "Edit Ingredient Type" : "Create Ingredient Type"}</SheetTitle>
+            <SheetTitle>
+              {editingId ? "Edit Ingredient Type" : "Create Ingredient Type"}
+            </SheetTitle>
             <SheetDescription>
               {editingId
                 ? "Update the ingredient type information below."
@@ -210,8 +223,8 @@ export default function AdminIngredientTypePage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Ingredient Type</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this ingredient type? This action will move
-              the ingredient type to trash and can be undone later.
+              Are you sure you want to delete this ingredient type? This action
+              will move the ingredient type to trash and can be undone later.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -220,7 +233,9 @@ export default function AdminIngredientTypePage() {
               onClick={handleDeleteIngredientType}
               disabled={deleteIngredientTypeMutation.isPending}
             >
-              {deleteIngredientTypeMutation.isPending ? "Deleting..." : "Delete"}
+              {deleteIngredientTypeMutation.isPending
+                ? "Deleting..."
+                : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -231,8 +246,8 @@ export default function AdminIngredientTypePage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Restore Ingredient Type</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to restore this ingredient type? This action will move
-              the ingredient type back to the active types list.
+              Are you sure you want to restore this ingredient type? This action
+              will move the ingredient type back to the active types list.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -241,7 +256,9 @@ export default function AdminIngredientTypePage() {
               onClick={handleRestoreIngredientType}
               disabled={restoreIngredientTypeMutation.isPending}
             >
-              {restoreIngredientTypeMutation.isPending ? "Restoring..." : "Restore"}
+              {restoreIngredientTypeMutation.isPending
+                ? "Restoring..."
+                : "Restore"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
