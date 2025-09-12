@@ -1,4 +1,12 @@
-import { ChefHat, ClipboardPenLine, ImagePlus, Link } from "lucide-react";
+import {
+  ChefHat,
+  ClipboardPenLine,
+  ImagePlus,
+  LinkIcon,
+  LucideProps,
+  PencilLine,
+} from "lucide-react";
+import Link from "next/link";
 import IconBackground from "../components/layout/icon-background";
 import { Button } from "../components/ui/button";
 import { cn } from "../lib/utils";
@@ -21,16 +29,19 @@ export default function Home() {
                 size="lg"
                 variant="default"
                 className="gap-0 cursor-pointer"
+                asChild
               >
-                <button.icon />
-                <span
-                  className={cn(
-                    "block w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 transition-all whitespace-nowrap overflow-hidden duration-600",
-                    button.className
-                  )}
-                >
-                  {button.label}
-                </span>
+                <Link href={button.href ?? ""}>
+                  <button.icon />
+                  <span
+                    className={cn(
+                      "block w-0 opacity-0 ml-0 group-hover:w-auto group-hover:opacity-100 transition-all whitespace-nowrap overflow-hidden duration-600 group-hover:ml-2",
+                      button.className
+                    )}
+                  >
+                    {button.label}
+                  </span>
+                </Link>
               </Button>
             </div>
           ))}
@@ -41,20 +52,35 @@ export default function Home() {
   );
 }
 
-const actionButtons = [
+type ActionButton = {
+  icon: React.ForwardRefExoticComponent<
+    Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+  >;
+  label: string;
+  className: string;
+  href?: string;
+};
+
+const actionButtons: ActionButton[] = [
+  {
+    icon: PencilLine,
+    label: "Write a Recipe",
+    className: "group-hover:w-[10ch]",
+    href: "/recipes/new",
+  },
   {
     icon: ClipboardPenLine,
     label: "Paste a Recipe",
-    className: "group-hover:w-[12ch]",
+    className: "group-hover:w-[11ch]",
   },
   {
-    icon: Link,
+    icon: LinkIcon,
     label: "Connect a Link",
-    className: "group-hover:w-[15ch]",
+    className: "group-hover:w-[11ch]",
   },
   {
     icon: ImagePlus,
     label: "Upload a Photo",
-    className: "group-hover:w-[12ch]",
+    className: "group-hover:w-[11ch]",
   },
 ];
